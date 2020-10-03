@@ -1,5 +1,8 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import tictactoe4k.Player.*
 import java.util.*
 import kotlin.collections.HashMap
@@ -26,13 +29,13 @@ class GameRepository(
 }
 
 data class Game(val moves: List<Move> = emptyList()) {
-    fun makeMove(x: Int, y: Int): Result<Game> {
-        if (isOver) return Result.failure(MoveAfterGameOver)
-        if (x !in 0..2 || y !in 0..2) return Result.failure(OutOfRangeMove(x, y))
-        if (moves.any { it.x == x && it.y == y }) return Result.failure(DuplicateMove(x, y))
+    fun makeMove(x: Int, y: Int): Result<Game, GameError> {
+        if (isOver) return Failure(MoveAfterGameOver)
+        if (x !in 0..2 || y !in 0..2) return Failure(OutOfRangeMove(x, y))
+        if (moves.any { it.x == x && it.y == y }) return Failure(DuplicateMove(x, y))
 
         val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
-        return Result.success(Game(moves + Move(x, y, nextPlayer)))
+        return Success(Game(moves + Move(x, y, nextPlayer)))
     }
 
     val winner: Player? = findWinner()
@@ -60,7 +63,8 @@ data class Move(
 
 enum class Player { X, O }
 
-object MoveAfterGameOver : Exception()
-data class OutOfRangeMove(val x: Int, val y: Int) : Exception()
-data class DuplicateMove(val x: Int, val y: Int) : Exception()
-data class GameNotFound(val gameId: String) : Exception()
+sealed class GameError
+object MoveAfterGameOver : GameError()
+data class OutOfRangeMove(val x: Int, val y: Int) : GameError()
+data class DuplicateMove(val x: Int, val y: Int) : GameError()
+data class GameNotFound(val gameId: String) : GameError()

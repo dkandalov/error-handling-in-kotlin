@@ -1,5 +1,7 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -51,12 +53,12 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
         val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
-        val updatedGame = game.makeMove(x, y).getOrElse { e: Throwable ->
-            return when (e) {
-                is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${e.x}, y=${e.y}")
-                is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${e.x}, y=${e.y}")
+        val updatedGame = game.makeMove(x, y).onFailure { failure: Failure<GameError> ->
+            return when (val reason = failure.reason) {
+                is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${reason.x}, y=${reason.y}")
+                is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${reason.x}, y=${reason.y}")
                 is MoveAfterGameOver -> Response(CONFLICT).body("Game is over")
-                else -> error("Should never happen")
+                is GameNotFound -> Response(BAD_REQUEST).body("Game not found id='${reason.gameId}'")
             }
         }
         gameRepository.update(gameId, updatedGame)
