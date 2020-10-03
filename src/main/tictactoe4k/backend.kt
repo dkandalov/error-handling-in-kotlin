@@ -46,25 +46,22 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
     }
 
     private fun makeMove(request: Request): Response {
-        return try {
+        val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
+        val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
+        val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
-            val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
-            val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
-            val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
-
-            val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
-            val updatedGame = game.makeMove(x, y).getOrThrow()
-            gameRepository.update(gameId, updatedGame)
-
-            Response(OK)
-
-        } catch (e: OutOfRangeMove) {
-            Response(CONFLICT).body("Move is out of range x=${e.x}, y=${e.y}")
-        } catch (e: DuplicateMove) {
-            Response(CONFLICT).body("Duplicate move x=${e.x}, y=${e.y}")
-        } catch (e: MoveAfterGameOver) {
-            Response(CONFLICT).body("Game is over")
+        val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
+        val updatedGame = game.makeMove(x, y).getOrElse { e: Throwable ->
+            return when (e) {
+                is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${e.x}, y=${e.y}")
+                is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${e.x}, y=${e.y}")
+                is MoveAfterGameOver -> Response(CONFLICT).body("Game is over")
+                else -> error("Should never happen")
+            }
         }
+        gameRepository.update(gameId, updatedGame)
+
+        return Response(OK)
     }
 
     private fun parseGameId(request: Request): String? {
