@@ -53,7 +53,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
             val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
             val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
-            val updatedGame = game.makeMove(x, y)
+            val updatedGame = game.makeMove(x, y).getOrThrow()
             gameRepository.update(gameId, updatedGame)
 
             Response(OK)

@@ -26,13 +26,13 @@ class GameRepository(
 }
 
 data class Game(val moves: List<Move> = emptyList()) {
-    fun makeMove(x: Int, y: Int): Game {
-        if (isOver) throw MoveAfterGameOver
-        if (x !in 0..2 || y !in 0..2) throw OutOfRangeMove(x, y)
-        if (moves.any { it.x == x && it.y == y }) throw DuplicateMove(x, y)
+    fun makeMove(x: Int, y: Int): Result<Game> {
+        if (isOver) return Result.failure(MoveAfterGameOver)
+        if (x !in 0..2 || y !in 0..2) return Result.failure(OutOfRangeMove(x, y))
+        if (moves.any { it.x == x && it.y == y }) return Result.failure(DuplicateMove(x, y))
 
         val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
-        return Game(moves + Move(x, y, nextPlayer))
+        return Result.success(Game(moves + Move(x, y, nextPlayer)))
     }
 
     val winner: Player? = findWinner()

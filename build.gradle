@@ -40,8 +40,8 @@ kotlin.sourceSets {
 
 compileKotlin.kotlinOptions.jvmTarget = "11"
 compileTestKotlin.kotlinOptions.jvmTarget = "11"
-//compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
-//compileTestKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
+compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
+compileTestKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
 
 tasks.test {
     useJUnitPlatform()
