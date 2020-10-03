@@ -42,12 +42,10 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
     private fun getGame(request: Request): Response {
         return try {
 
-            val gameId = parseGameId(request)
+            val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
             val game = gameRepository.find(gameId)
             Response(OK).body(game.toJson())
 
-        } catch (e: FailedToParseRequest) {
-            Response(BAD_REQUEST).body(e.message)
         } catch (e: GameNotFound) {
             Response(BAD_REQUEST).body("Game not found id='${e.gameId}'")
         }
@@ -56,9 +54,9 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
     private fun makeMove(request: Request): Response {
         return try {
 
-            val gameId = parseGameId(request)
-            val x = parseX(request)
-            val y = parseY(request)
+            val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
+            val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
+            val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
             val game = gameRepository.find(gameId)
             val updatedGame = game.makeMove(x, y)
@@ -66,8 +64,6 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
             Response(OK)
 
-        } catch (e: FailedToParseRequest) {
-            Response(BAD_REQUEST).body(e.message)
         } catch (e: GameNotFound) {
             Response(BAD_REQUEST).body("Game not found id='${e.gameId}'")
         } catch (e: OutOfRangeMove) {
@@ -79,31 +75,23 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         }
     }
 
-    private fun parseGameId(request: Request): String {
-        val gameId = request.path("gameId")
-        if (gameId == null) throw FailedToParseRequest("game id is required")
-        else return gameId
+    private fun parseGameId(request: Request): String? {
+        return request.path("gameId")
     }
 
-    private fun parseX(request: Request): Int {
+    private fun parseX(request: Request): Int? =
         try {
-            val x = request.query("x")
-            if (x == null) throw FailedToParseRequest("x and y are required")
-            else return x.toInt()
+            request.query("x")?.toInt()
         } catch (e: NumberFormatException) {
-            throw FailedToParseRequest(e.message ?: "")
+            null
         }
-    }
 
-    private fun parseY(request: Request): Int {
+    private fun parseY(request: Request): Int? =
         try {
-            val y = request.query("y")
-            if (y == null) throw FailedToParseRequest("x and y are required")
-            else return y.toInt()
+            request.query("y")?.toInt()
         } catch (e: NumberFormatException) {
-            throw FailedToParseRequest(e.message ?: "")
+            null
         }
-    }
 }
 
 class FailedToParseRequest(override val message: String) : Exception(message)
