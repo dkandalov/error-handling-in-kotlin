@@ -43,7 +43,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
     private fun getGame(request: Request): Response {
         val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
-        val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
+        val game = gameRepository.find(gameId).onFailure { return it.toResponse() }
         return Response(OK).body(game.toJson())
     }
 
@@ -52,18 +52,20 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
-        val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
-        val updatedGame = game.makeMove(x, y).onFailure { failure: Failure<GameError> ->
-            return when (val reason = failure.reason) {
-                is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${reason.x}, y=${reason.y}")
-                is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${reason.x}, y=${reason.y}")
-                is MoveAfterGameOver -> Response(CONFLICT).body("Game is over")
-                is GameNotFound -> Response(BAD_REQUEST).body("Game not found id='${reason.gameId}'")
-            }
-        }
-        gameRepository.update(gameId, updatedGame)
+        val game = gameRepository.find(gameId).onFailure { return it.toResponse() }
+        val updatedGame = game.makeMove(x, y).onFailure { return it.toResponse() }
+        gameRepository.update(gameId, updatedGame).onFailure { return it.toResponse() }
 
         return Response(OK)
+    }
+
+    private fun Failure<GameError>.toResponse(): Response {
+        return when (val reason = reason) {
+            is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${reason.x}, y=${reason.y}")
+            is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${reason.x}, y=${reason.y}")
+            is MoveAfterGameOver -> Response(CONFLICT).body("Game is over")
+            is GameNotFound -> Response(BAD_REQUEST).body("Game not found id='${reason.gameId}'")
+        }
     }
 
     private fun parseGameId(request: Request): String? {

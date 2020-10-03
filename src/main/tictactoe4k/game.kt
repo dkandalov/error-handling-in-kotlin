@@ -3,6 +3,7 @@ package tictactoe4k
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.asResultOr
 import tictactoe4k.Player.*
 import java.util.*
 import kotlin.collections.HashMap
@@ -11,14 +12,14 @@ class GameRepository(
     private val gamesById: MutableMap<String, Game> = HashMap(),
     private val generateId: () -> String = { UUID.randomUUID().toString() }
 ) {
-    fun find(gameId: String): Game? {
-        return gamesById[gameId]
+    fun find(gameId: String): Result<Game, GameError> {
+        return gamesById[gameId].asResultOr { GameNotFound(gameId) }
     }
 
-    fun update(gameId: String, game: Game): Game? {
-        if (gameId !in gamesById.keys) return null
+    fun update(gameId: String, game: Game): Result<Game, GameError> {
+        if (gameId !in gamesById.keys) return Failure(GameNotFound(gameId))
         gamesById[gameId] = game
-        return game
+        return Success(game)
     }
 
     fun add(game: Game): String {
