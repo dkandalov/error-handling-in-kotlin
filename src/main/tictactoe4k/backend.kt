@@ -40,15 +40,9 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
     }
 
     private fun getGame(request: Request): Response {
-        return try {
-
-            val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
-            val game = gameRepository.find(gameId)
-            Response(OK).body(game.toJson())
-
-        } catch (e: GameNotFound) {
-            Response(BAD_REQUEST).body("Game not found id='${e.gameId}'")
-        }
+        val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
+        val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
+        return Response(OK).body(game.toJson())
     }
 
     private fun makeMove(request: Request): Response {
@@ -58,14 +52,12 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
             val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
             val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
-            val game = gameRepository.find(gameId)
+            val game = gameRepository.find(gameId) ?: return Response(BAD_REQUEST).body("Game not found id='${gameId}'")
             val updatedGame = game.makeMove(x, y)
             gameRepository.update(gameId, updatedGame)
 
             Response(OK)
 
-        } catch (e: GameNotFound) {
-            Response(BAD_REQUEST).body("Game not found id='${e.gameId}'")
         } catch (e: OutOfRangeMove) {
             Response(CONFLICT).body("Move is out of range x=${e.x}, y=${e.y}")
         } catch (e: DuplicateMove) {
