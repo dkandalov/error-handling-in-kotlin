@@ -1,6 +1,8 @@
 package tictactoe4k
 
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -52,11 +54,16 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
-        val game = gameRepository.find(gameId).onFailure { return it.toResponse() }
-        val updatedGame = game.makeMove(x, y).onFailure { return it.toResponse() }
-        gameRepository.update(gameId, updatedGame).onFailure { return it.toResponse() }
+        return when (val result = makeMove(gameId, x, y)) {
+            is Success -> Response(OK)
+            is Failure -> result.toResponse()
+        }
+    }
 
-        return Response(OK)
+    private fun makeMove(gameId: String, x: Int, y: Int): Result<Game, GameError> {
+        val game = gameRepository.find(gameId).onFailure { return it }
+        val updatedGame = game.makeMove(x, y).onFailure { return it }
+        return gameRepository.update(gameId, updatedGame)
     }
 
     private fun Failure<GameError>.toResponse(): Response {
