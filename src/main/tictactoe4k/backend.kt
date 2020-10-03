@@ -1,9 +1,6 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result
-import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.result4k.*
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -61,9 +58,11 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
     }
 
     private fun makeMove(gameId: String, x: Int, y: Int): Result<Game, GameError> {
-        val game = gameRepository.find(gameId).onFailure { return it }
-        val updatedGame = game.makeMove(x, y).onFailure { return it }
-        return gameRepository.update(gameId, updatedGame)
+        return gameRepository.find(gameId).flatMap { game ->
+            game.makeMove(x, y).flatMap { updatedGame: Game ->
+                gameRepository.update(gameId, updatedGame)
+            }
+        }
     }
 
     private fun Failure<GameError>.toResponse(): Response {
