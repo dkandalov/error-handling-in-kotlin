@@ -1,0 +1,24 @@
+<meta charset="UTF-8">
+<body style="font-family: 'Menlo',serif; font-size: 70px;">
+{{#each rows~}}
+    <p>
+        {{#each this}}
+            {{~#if player~}}
+                {{player}}
+            {{~else~}}
+                <a href="/game/{{gameId}}/move?x={{x}}&y={{y}}">_</a>
+            {{~/if~}}
+            &nbsp;
+        {{/each}}
+    </p>
+{{~/each}}
+{{#if over~}}
+    {{~#if winner~}}
+        {{winner}} wins!! 🥳
+    {{~else~}}
+        It's a draw!
+    {{~/if}}
+    <br/>
+    <a href="/">Start new game</a>?
+{{~/if~}}
+</body>
