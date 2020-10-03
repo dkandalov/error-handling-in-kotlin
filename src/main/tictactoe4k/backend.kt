@@ -1,8 +1,11 @@
 package tictactoe4k
 
 import arrow.core.Either
+import arrow.core.Left
+import arrow.core.computations.either
 import arrow.core.flatMap
 import arrow.core.getOrHandle
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -32,7 +35,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         routes(
             "/game" bind POST to { newGame() },
             "/game/{gameId}" bind GET to { request -> getGame(request) },
-            "/game/{gameId}/moves" bind POST to { request -> makeMove(request) }
+            "/game/{gameId}/moves" bind POST to { request -> runBlocking { makeMove(request) } }
         ).withFilter(CatchAllExceptions())
 
     override fun invoke(request: Request) = httpHandler(request)
@@ -48,7 +51,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         return Response(OK).body(game.toJson())
     }
 
-    private fun makeMove(request: Request): Response {
+    private suspend fun makeMove(request: Request): Response {
         val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
         val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
@@ -59,12 +62,10 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         }
     }
 
-    private fun makeMove(gameId: String, x: Int, y: Int): Either<GameError, Game> {
-        return gameRepository.find(gameId).flatMap { game ->
-            game.makeMove(x, y).flatMap { updatedGame: Game ->
-                gameRepository.update(gameId, updatedGame)
-            }
-        }
+    private suspend fun makeMove(gameId: String, x: Int, y: Int): Either<GameError, Game> = either {
+        val game = gameRepository.find(gameId).bind()
+        val updatedGame = game.makeMove(x, y).bind()
+        gameRepository.update(gameId, updatedGame).bind()
     }
 
     private fun GameError.toResponse(): Response {
