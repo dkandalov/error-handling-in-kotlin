@@ -60,7 +60,7 @@ class Frontend(private val backend: HttpHandler) : HttpHandler {
     }
 
     private fun parseGameId(request: Request): String {
-        return request.path("gameId") ?: throw BadRequest("game id is required")
+        return request.path("gameId") ?: throw FailedToParseRequest("game id is required")
     }
 
     private fun Game.toView(gameId: String) = GameView(

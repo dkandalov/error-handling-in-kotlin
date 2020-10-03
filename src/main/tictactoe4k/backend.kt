@@ -46,7 +46,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
             val game = gameRepository.find(gameId)
             Response(OK).body(game.toJson())
 
-        } catch (e: BadRequest) {
+        } catch (e: FailedToParseRequest) {
             Response(BAD_REQUEST).body(e.message)
         } catch (e: GameNotFound) {
             Response(BAD_REQUEST).body("Game not found id='${e.gameId}'")
@@ -66,10 +66,8 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
             Response(OK)
 
-        } catch (e: BadRequest) {
+        } catch (e: FailedToParseRequest) {
             Response(BAD_REQUEST).body(e.message)
-        } catch (e: NumberFormatException) {
-            Response(BAD_REQUEST).body(e.message ?: "")
         } catch (e: GameNotFound) {
             Response(BAD_REQUEST).body("Game not found id='${e.gameId}'")
         } catch (e: OutOfRangeMove) {
@@ -83,24 +81,32 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
     private fun parseGameId(request: Request): String {
         val gameId = request.path("gameId")
-        if (gameId == null) throw BadRequest("game id is required")
+        if (gameId == null) throw FailedToParseRequest("game id is required")
         else return gameId
     }
 
     private fun parseX(request: Request): Int {
-        val x = request.query("x")
-        if (x == null) throw BadRequest("x and y are required")
-        else return x.toInt()
+        try {
+            val x = request.query("x")
+            if (x == null) throw FailedToParseRequest("x and y are required")
+            else return x.toInt()
+        } catch (e: NumberFormatException) {
+            throw FailedToParseRequest(e.message ?: "")
+        }
     }
 
     private fun parseY(request: Request): Int {
-        val y = request.query("y")
-        if (y == null) throw BadRequest("x and y are required")
-        else return y.toInt()
+        try {
+            val y = request.query("y")
+            if (y == null) throw FailedToParseRequest("x and y are required")
+            else return y.toInt()
+        } catch (e: NumberFormatException) {
+            throw FailedToParseRequest(e.message ?: "")
+        }
     }
 }
 
-class BadRequest(override val message: String) : Exception(message)
+class FailedToParseRequest(override val message: String) : Exception(message)
 
 private class CatchAllExceptions : Filter {
     override fun invoke(httpHandler: HttpHandler): HttpHandler = { request ->
