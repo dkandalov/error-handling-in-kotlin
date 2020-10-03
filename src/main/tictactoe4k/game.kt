@@ -1,9 +1,9 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result
-import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.asResultOr
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.rightIfNotNull
 import tictactoe4k.Player.*
 import java.util.*
 import kotlin.collections.HashMap
@@ -12,14 +12,14 @@ class GameRepository(
     private val gamesById: MutableMap<String, Game> = HashMap(),
     private val generateId: () -> String = { UUID.randomUUID().toString() }
 ) {
-    fun find(gameId: String): Result<Game, GameError> {
-        return gamesById[gameId].asResultOr { GameNotFound(gameId) }
+    fun find(gameId: String): Either<GameError, Game> {
+        return gamesById[gameId].rightIfNotNull { GameNotFound(gameId) }
     }
 
-    fun update(gameId: String, game: Game): Result<Game, GameError> {
-        if (gameId !in gamesById.keys) return Failure(GameNotFound(gameId))
+    fun update(gameId: String, game: Game): Either<GameError, Game> {
+        if (gameId !in gamesById.keys) return Left(GameNotFound(gameId))
         gamesById[gameId] = game
-        return Success(game)
+        return Right(game)
     }
 
     fun add(game: Game): String {
@@ -30,13 +30,13 @@ class GameRepository(
 }
 
 data class Game(val moves: List<Move> = emptyList()) {
-    fun makeMove(x: Int, y: Int): Result<Game, GameError> {
-        if (isOver) return Failure(MoveAfterGameOver)
-        if (x !in 0..2 || y !in 0..2) return Failure(OutOfRangeMove(x, y))
-        if (moves.any { it.x == x && it.y == y }) return Failure(DuplicateMove(x, y))
+    fun makeMove(x: Int, y: Int): Either<GameError, Game> {
+        if (isOver) return Left(MoveAfterGameOver)
+        if (x !in 0..2 || y !in 0..2) return Left(OutOfRangeMove(x, y))
+        if (moves.any { it.x == x && it.y == y }) return Left(DuplicateMove(x, y))
 
         val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
-        return Success(Game(moves + Move(x, y, nextPlayer)))
+        return Right(Game(moves + Move(x, y, nextPlayer)))
     }
 
     val winner: Player? = findWinner()

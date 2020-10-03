@@ -1,6 +1,8 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.*
+import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.getOrHandle
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -42,7 +44,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
     private fun getGame(request: Request): Response {
         val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
-        val game = gameRepository.find(gameId).onFailure { return it.toResponse() }
+        val game = gameRepository.find(gameId).getOrHandle { return it.toResponse() }
         return Response(OK).body(game.toJson())
     }
 
@@ -52,12 +54,12 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
         return when (val result = makeMove(gameId, x, y)) {
-            is Success -> Response(OK)
-            is Failure -> result.toResponse()
+            is Either.Left -> result.a.toResponse()
+            is Either.Right -> Response(OK)
         }
     }
 
-    private fun makeMove(gameId: String, x: Int, y: Int): Result<Game, GameError> {
+    private fun makeMove(gameId: String, x: Int, y: Int): Either<GameError, Game> {
         return gameRepository.find(gameId).flatMap { game ->
             game.makeMove(x, y).flatMap { updatedGame: Game ->
                 gameRepository.update(gameId, updatedGame)
@@ -65,8 +67,8 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         }
     }
 
-    private fun Failure<GameError>.toResponse(): Response {
-        return when (val reason = reason) {
+    private fun GameError.toResponse(): Response {
+        return when (val reason = this) {
             is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${reason.x}, y=${reason.y}")
             is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${reason.x}, y=${reason.y}")
             is MoveAfterGameOver -> Response(CONFLICT).body("Game is over")
