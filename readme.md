@@ -11,4 +11,5 @@ Links and technologies mentioned in the talk:
  - [kotlin.Result](https://github.com/Kotlin/KEEP/blob/master/proposals/stdlib/result.md), [KEEP-127](https://github.com/Kotlin/KEEP/issues/127)
  - [result4k](https://github.com/fork-handles/forkhandles/tree/trunk/result4k) ([old result4k](https://github.com/npryce/result4k))
  - [Arrow](https://arrow-kt.io)
+ - [Session Types in Programming Languages: A Collection of Implementations](http://groups.inf.ed.ac.uk/abcd/session-implementations.html)
  - [Failure is not an Option](http://www.oneeyedmen.com/failure-is-not-an-option-part-1.html) by Duncan McGregor

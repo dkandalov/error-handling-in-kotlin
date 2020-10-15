@@ -1,9 +1,7 @@
 package tictactoe4k
 
 import arrow.core.Either
-import arrow.core.Left
 import arrow.core.computations.either
-import arrow.core.flatMap
 import arrow.core.getOrHandle
 import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
