@@ -1,8 +1,8 @@
 package tictactoe4k
 
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.rightIfNotNull
 import tictactoe4k.Player.*
 import java.util.*

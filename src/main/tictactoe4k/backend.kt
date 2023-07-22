@@ -55,7 +55,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
         return when (val result = makeMove(gameId, x, y)) {
-            is Either.Left -> result.a.toResponse()
+            is Either.Left -> result.value.toResponse()
             is Either.Right -> Response(OK)
         }
     }
