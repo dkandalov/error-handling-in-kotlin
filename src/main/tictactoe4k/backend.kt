@@ -1,9 +1,8 @@
 package tictactoe4k
 
 import arrow.core.Either
-import arrow.core.computations.either
-import arrow.core.getOrHandle
-import kotlinx.coroutines.runBlocking
+import arrow.core.getOrElse
+import arrow.core.raise.either
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -33,7 +32,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         routes(
             "/game" bind POST to { newGame() },
             "/game/{gameId}" bind GET to { request -> getGame(request) },
-            "/game/{gameId}/moves" bind POST to { request -> runBlocking { makeMove(request) } }
+            "/game/{gameId}/moves" bind POST to { request -> makeMove(request) }
         ).withFilter(CatchAllExceptions())
 
     override fun invoke(request: Request) = httpHandler(request)
@@ -45,11 +44,11 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
     private fun getGame(request: Request): Response {
         val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
-        val game = gameRepository.find(gameId).getOrHandle { return it.toResponse() }
+        val game = gameRepository.find(gameId).getOrElse { return it.toResponse() }
         return Response(OK).body(game.toJson())
     }
 
-    private suspend fun makeMove(request: Request): Response {
+    private fun makeMove(request: Request): Response {
         val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
         val x = parseX(request) ?: return Response(BAD_REQUEST).body("x and y are required")
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
@@ -60,24 +59,22 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         }
     }
 
-    private suspend fun makeMove(gameId: String, x: Int, y: Int): Either<GameError, Game> = either {
+    private fun makeMove(gameId: String, x: Int, y: Int): Either<GameError, Game> = either {
         val game = gameRepository.find(gameId).bind()
         val updatedGame = game.makeMove(x, y).bind()
         gameRepository.update(gameId, updatedGame).bind()
     }
 
-    private fun GameError.toResponse(): Response {
-        return when (val reason = this) {
+    private fun GameError.toResponse(): Response =
+        when (val reason = this) {
             is OutOfRangeMove -> Response(CONFLICT).body("Move is out of range x=${reason.x}, y=${reason.y}")
             is DuplicateMove -> Response(CONFLICT).body("Duplicate move x=${reason.x}, y=${reason.y}")
             is MoveAfterGameOver -> Response(CONFLICT).body("Game is over")
             is GameNotFound -> Response(BAD_REQUEST).body("Game not found id='${reason.gameId}'")
         }
-    }
 
-    private fun parseGameId(request: Request): String? {
-        return request.path("gameId")
-    }
+    private fun parseGameId(request: Request): String? =
+        request.path("gameId")
 
     private fun parseX(request: Request): Int? =
         try {
@@ -106,14 +103,11 @@ private class CatchAllExceptions : Filter {
     }
 }
 
-fun Game.toJson(): String {
-    return Jackson.mapper.writeValueAsString(this)
-}
+fun Game.toJson(): String =
+    Jackson.mapper.writeValueAsString(this)
 
-fun String.parseGameJson(): Game {
-    return Jackson.mapper.readValue(this, Game::class.java)
-}
+fun String.parseGameJson(): Game =
+    Jackson.mapper.readValue(this, Game::class.java)
 
-fun Response.parseGameJson(): Game {
-    return Jackson.mapper.readValue(bodyString(), Game::class.java)
-}
+fun Response.parseGameJson(): Game =
+    Jackson.mapper.readValue(bodyString(), Game::class.java)
