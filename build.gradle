@@ -39,6 +39,7 @@ kotlin.sourceSets {
     test.kotlin.srcDirs += "src/test"
 }
 
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 compileKotlin.kotlinOptions.jvmTarget = "17"
 compileTestKotlin.kotlinOptions.jvmTarget = "17"
 compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
