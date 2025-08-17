@@ -1,6 +1,7 @@
 package tictactoe4k
 
-import datsok.shouldEqual
+import strikt.api.expectThat
+import strikt.assertions.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -25,12 +26,12 @@ class BackendTests {
     @Test fun `create new game`() {
         val gameId = backend(Request(POST, "/game")).expectOK().bodyString()
         val response = backend(Request(GET, "/game/$gameId")).expectOK()
-        response.parseGameJson() shouldEqual Game()
+        expectThat(response.parseGameJson()).isEqualTo(Game())
     }
 
     @Test fun `get game state`() {
         val response = backend(Request(GET, "/game/$id")).expectOK()
-        response.parseGameJson() shouldEqual Game()
+        expectThat(response.parseGameJson()).isEqualTo(Game())
     }
 
     @Test fun `players take turns on each move`() {
@@ -39,13 +40,13 @@ class BackendTests {
         backend.makeMove(id, 2, 1).expectOK()
 
         val response = backend(Request(GET, "/game/$id")).expectOK()
-        response.parseGameJson() shouldEqual Game(
+        expectThat(response.parseGameJson()).isEqualTo(Game(
             moves = listOf(
                 Move(0, 1, X),
                 Move(2, 0, O),
                 Move(2, 1, X)
             )
-        )
+        ))
     }
 
     @Test fun `can't get state of non-existent game`() {
@@ -77,13 +78,13 @@ class BackendTests {
         val gameJson =
             """{"moves":[{"x":0,"y":0,"player":"X"},{"x":1,"y":1,"player":"O"},{"x":2,"y":2,"player":"X"}],"winner":null,"isOver":false}"""
 
-        game.toJson() shouldEqual gameJson
-        gameJson.parseGameJson() shouldEqual game
+        expectThat(game.toJson()).isEqualTo(gameJson)
+        expectThat(gameJson.parseGameJson()).isEqualTo(game)
     }
 
     @Test fun `convert json to game with invalid state`() {
         val game = """{"moves":[],"winner":null,"isOver":true}""".parseGameJson()
-        game.isOver shouldEqual true
+        expectThat(game.isOver).isTrue()
     }
 }
 
@@ -120,14 +121,14 @@ fun Backend.gameEndsInDraw(id: String): Game {
 }
 
 fun Response.expectOK(): Response {
-    status shouldEqual OK
+    expectThat(status).isEqualTo(OK)
     return this
 }
 
 fun Response.expect(expectedStatus: Status, expectedBody: String? = null): Response {
-    status shouldEqual expectedStatus
+    expectThat(status).isEqualTo(expectedStatus)
     if (expectedBody != null) {
-        bodyString() shouldEqual expectedBody
+        expectThat(bodyString()).isEqualTo(expectedBody)
     }
     return this
 }

@@ -1,6 +1,7 @@
 package tictactoe4k
 
-import datsok.shouldEqual
+import strikt.api.expectThat
+import strikt.assertions.*
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 
@@ -18,32 +19,32 @@ class GameViaBackendTests {
         backend.makeMove(id, 2, 1)
 
         val updatedGame = backend.findGame(id).parseGameJson()
-        updatedGame shouldEqual Game(
+        expectThat(updatedGame).isEqualTo(Game(
             moves = listOf(
                 Move(0, 1, Player.X),
                 Move(2, 0, Player.O),
                 Move(2, 1, Player.X)
             )
-        )
-        updatedGame.isOver shouldEqual false
+        ))
+        expectThat(updatedGame.isOver).isFalse()
     }
 
     @Test fun `player X wins`() {
         val game = backend.gameWonByPlayerX(id)
-        game.winner shouldEqual Player.X
-        game.isOver shouldEqual true
+        expectThat(game.winner).isEqualTo(Player.X)
+        expectThat(game.isOver).isTrue()
     }
 
     @Test fun `player O wins`() {
         val game = backend.gameWonByPlayerO(id)
-        game.winner shouldEqual Player.O
-        game.isOver shouldEqual true
+        expectThat(game.winner).isEqualTo(Player.O)
+        expectThat(game.isOver).isTrue()
     }
 
     @Test fun `game ends in a draw`() {
         val game = backend.gameEndsInDraw(id)
-        game.winner shouldEqual null
-        game.isOver shouldEqual true
+        expectThat(game.winner).isEqualTo(null)
+        expectThat(game.isOver).isTrue()
     }
 
     @Test fun `can't make the same move twice`() {
