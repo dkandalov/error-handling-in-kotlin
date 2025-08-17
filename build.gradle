@@ -32,11 +32,9 @@ kotlin.sourceSets {
     test.kotlin.srcDirs += "src/test"
 }
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-compileKotlin.kotlinOptions.jvmTarget = "21"
-compileTestKotlin.kotlinOptions.jvmTarget = "21"
-compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
-compileTestKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
+kotlin {
+    jvmToolchain(21)
+}
 
 tasks.test {
     useJUnitPlatform()

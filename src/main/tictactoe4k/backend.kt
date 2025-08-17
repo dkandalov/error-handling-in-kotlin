@@ -31,8 +31,8 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
     private val httpHandler =
         routes(
             "/game" bind POST to { newGame() },
-            "/game/{gameId}" bind GET to { request -> getGame(request) },
-            "/game/{gameId}/moves" bind POST to { request -> makeMove(request) }
+            "/game/{gameId}" bind GET to ::getGame,
+            "/game/{gameId}/moves" bind POST to ::makeMove
         ).withFilter(CatchAllExceptions())
 
     override fun invoke(request: Request) = httpHandler(request)
@@ -110,4 +110,4 @@ fun String.parseGameJson(): Game =
     Jackson.mapper.readValue(this, Game::class.java)
 
 fun Response.parseGameJson(): Game =
-    Jackson.mapper.readValue(bodyString(), Game::class.java)
+    bodyString().parseGameJson()
