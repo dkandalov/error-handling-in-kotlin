@@ -8,6 +8,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -18,7 +19,7 @@ import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 
 fun main() {
-    val backendClient = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost:1234")).then(OkHttp())
+    val backendClient = SetBaseUriFrom(Uri.of("http://localhost:1234")).then(OkHttp())
     Frontend(backendClient)
         .asServer(ApacheServer(port = 8080))
         .start()
@@ -55,30 +56,32 @@ class Frontend(private val backend: HttpHandler) : HttpHandler {
         val gameId = parseGameId(request)
         val x = request.query("x")
         val y = request.query("y")
+
         backend(Request(POST, "/game/$gameId/moves?x=$x&y=$y"))
+
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
-    private fun parseGameId(request: Request): String {
-        return request.path("gameId") ?: throw FailedToParseRequest("game id is required")
-    }
+    private fun parseGameId(request: Request): String =
+        request.path("gameId") ?: throw FailedToParseRequest("game id is required")
 
-    private fun Game.toView(gameId: String) = GameView(
-        rows = (0..2).map { x ->
-            (0..2).map { y ->
-                val player = moves.find { it.x == x && it.y == y }?.player?.name
-                CellView(x, y, gameId, player)
-            }
-        },
-        winner = winner?.name,
-        isOver = isOver
-    )
+    private fun Game.toView(gameId: String) =
+        GameView(
+            rows = (0..2).map { x ->
+                (0..2).map { y ->
+                    val player = moves.find { it.x == x && it.y == y }?.player?.name
+                    CellView(x, y, gameId, player)
+                }
+            },
+            winner = winner?.name,
+            isOver = isOver
+        )
 }
 
 private class GameView(
     val rows: List<List<CellView>>,
     val winner: String?,
-    val isOver: Boolean
+    val isOver: Boolean,
 ) : ViewModel
 
 private class CellView(val x: Int, val y: Int, val gameId: String, val player: String?)

@@ -42,7 +42,7 @@ data class Game(val moves: List<Move> = emptyList()) {
     val isOver = winner != null || moves.size == 9
 
     private fun findWinner(): Player? =
-        entries.find { player ->
+        Player.entries.find { player ->
             (0..2).all { Move(it, 0, player) in moves } ||
             (0..2).all { Move(it, 1, player) in moves } ||
             (0..2).all { Move(it, 2, player) in moves } ||
