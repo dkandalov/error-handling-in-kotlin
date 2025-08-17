@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "1.9.0"
+    id "org.jetbrains.kotlin.jvm" version "2.2.10"
 }
 
 group "tictactoe4k"
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation platform("org.http4k:http4k-bom:4.40.2.0")
+    implementation platform("org.http4k:http4k-bom:6.15.1.0")
     implementation "org.http4k:http4k-core"
     implementation "org.http4k:http4k-server-apache"
     implementation "org.http4k:http4k-client-okhttp"
@@ -39,9 +39,9 @@ kotlin.sourceSets {
     test.kotlin.srcDirs += "src/test"
 }
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-compileKotlin.kotlinOptions.jvmTarget = "17"
-compileTestKotlin.kotlinOptions.jvmTarget = "17"
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+compileKotlin.kotlinOptions.jvmTarget = "21"
+compileTestKotlin.kotlinOptions.jvmTarget = "21"
 compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
 compileTestKotlin.kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
 
