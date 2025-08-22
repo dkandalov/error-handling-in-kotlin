@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.CONFLICT
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
@@ -62,6 +63,20 @@ class BackendTests {
         backend(Request(POST, "/game/$id/moves")).expect(BAD_REQUEST, "x and y are required")
         backend(Request(POST, "/game/$id/moves?x=0")).expect(BAD_REQUEST, "x and y are required")
         backend(Request(POST, "/game/$id/moves?y=0")).expect(BAD_REQUEST, "x and y are required")
+    }
+
+    @Test fun `out of range move`() {
+        backend(Request(POST, "/game/$id/moves?x=100&y=100")).expect(CONFLICT, "Move is out of range x=100, y=100")
+        backend(Request(POST, "/game/$id/moves?x=0&y=-1")).expect(CONFLICT, "Move is out of range x=0, y=-1")
+    }
+
+    @Test fun `duplicate move`() {
+        backend(Request(POST, "/game/$id/moves?x=1&y=1")).expect(OK)
+        backend(Request(POST, "/game/$id/moves?x=1&y=1")).expect(CONFLICT, "Duplicate move x=1, y=1")
+    }
+    @Test fun `can't make moves after game is over`() {
+        backend.gameWonByPlayerX(id)
+        backend(Request(POST, "/game/$id/moves?x=1&y=1")).expect(CONFLICT, "Game is over")
     }
 
     @Test fun `invalid type of arguments on move request`() {
