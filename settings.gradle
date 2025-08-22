@@ -1,2 +1,16 @@
-rootProject.name = "error-handling-in-kotlin"
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
 
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "error-handling-in-kotlin"

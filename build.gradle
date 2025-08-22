@@ -1,12 +1,13 @@
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "2.2.10"
+    id "org.jetbrains.kotlin.jvm" version "2.2.255-SNAPSHOT"
 }
 
 group "tictactoe4k"
 version "1.0-SNAPSHOT"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
