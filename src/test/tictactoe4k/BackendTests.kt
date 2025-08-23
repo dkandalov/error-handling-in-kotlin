@@ -1,7 +1,5 @@
 package tictactoe4k
 
-import strikt.api.expectThat
-import strikt.assertions.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -12,6 +10,9 @@ import org.http4k.core.Status.Companion.CONFLICT
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
+import strikt.api.expectThat
+import strikt.assertions.isEqualTo
+import strikt.assertions.isTrue
 import tictactoe4k.Player.O
 import tictactoe4k.Player.X
 import java.util.concurrent.atomic.AtomicInteger
@@ -75,7 +76,7 @@ class BackendTests {
         backend(Request(POST, "/game/$id/moves?x=1&y=1")).expect(CONFLICT, "Duplicate move x=1, y=1")
     }
     @Test fun `can't make moves after game is over`() {
-        backend.gameWonByPlayerX(id)
+        val _ = backend.gameWonByPlayerX(id)
         backend(Request(POST, "/game/$id/moves?x=1&y=1")).expect(CONFLICT, "Game is over")
     }
 
@@ -109,6 +110,7 @@ fun Backend.addGame() =
 fun Backend.findGame(id: String) =
     this(Request(GET, "/game/$id"))
 
+@IgnorableReturnValue
 fun Backend.makeMove(id: String, x: Int, y: Int) =
     this(Request(POST, "/game/$id/moves?x=$x&y=$y"))
 
@@ -135,11 +137,13 @@ fun Backend.gameEndsInDraw(id: String): Game {
     return findGame(id).parseGameJson()
 }
 
+@IgnorableReturnValue
 fun Response.expectOK(): Response {
     expectThat(status).isEqualTo(OK)
     return this
 }
 
+@IgnorableReturnValue
 fun Response.expect(expectedStatus: Status, expectedBody: String? = null): Response {
     expectThat(status).isEqualTo(expectedStatus)
     if (expectedBody != null) {

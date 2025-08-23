@@ -33,6 +33,8 @@ kotlin.sourceSets {
     test.kotlin.srcDirs += "src/test"
 }
 
+kotlin.compilerOptions.freeCompilerArgs.add("-Xreturn-value-checker=full")
+
 kotlin {
     jvmToolchain(21)
 }

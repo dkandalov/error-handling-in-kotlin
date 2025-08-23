@@ -61,7 +61,7 @@ class GameViaBackendTests {
     }
 
     @Test fun `can't make moves when the game is over`() {
-        backend.gameWonByPlayerX(id)
+        val _ = backend.gameWonByPlayerX(id)
         backend.makeMove(id, 2, 2).expect(CONFLICT, "Game is over")
     }
 }

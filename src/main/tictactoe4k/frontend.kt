@@ -44,7 +44,7 @@ class Frontend(private val backend: HttpHandler) : HttpHandler {
         val x = request.query("x")
         val y = request.query("y")
 
-        backend(Request(POST, "/game/$gameId/moves?x=$x&y=$y"))
+        val _ = backend(Request(POST, "/game/$gameId/moves?x=$x&y=$y"))
 
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }

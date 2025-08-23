@@ -40,12 +40,12 @@ class FrontendTests {
     }
 
     @Test fun `player X wins`(approver: Approver) {
-        backend.gameWonByPlayerX(id)
+        val _ = backend.gameWonByPlayerX(id)
         approver.assertApproved(frontend(Request(GET, "/game/$id")).expectOK())
     }
 
     @Test fun `game ends in a draw`(approver: Approver) {
-        backend.gameEndsInDraw(id)
+        val _ = backend.gameEndsInDraw(id)
         approver.assertApproved(frontend(Request(GET, "/game/$id")).expectOK())
     }
 
