@@ -1,8 +1,9 @@
 package tictactoe4k
 
-import arrow.core.Either
-import arrow.core.getOrElse
-import arrow.core.raise.either
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result4k
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -44,7 +45,7 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
 
     private fun getGame(request: Request): Response {
         val gameId = parseGameId(request) ?: return Response(BAD_REQUEST).body("game id is required")
-        val game = gameRepository.find(gameId).getOrElse { return it.toResponse() }
+        val game = gameRepository.find(gameId).onFailure { return it.reason.toResponse() }
         return Response(OK).body(game.toJson())
     }
 
@@ -54,15 +55,15 @@ class Backend(private val gameRepository: GameRepository) : HttpHandler {
         val y = parseY(request) ?: return Response(BAD_REQUEST).body("x and y are required")
 
         return when (val result = makeMove(gameId, x, y)) {
-            is Either.Left -> result.value.toResponse()
-            is Either.Right -> Response(OK)
+            is Failure<GameError> -> result.reason.toResponse()
+            is Success<*> -> Response(OK)
         }
     }
 
-    private fun makeMove(gameId: String, x: Int, y: Int): Either<GameError, Game> = either {
-        val game = gameRepository.find(gameId).bind()
-        val updatedGame = game.makeMove(x, y).bind()
-        gameRepository.update(gameId, updatedGame).bind()
+    private fun makeMove(gameId: String, x: Int, y: Int): Result4k<Game, GameError> {
+        val game = gameRepository.find(gameId).onFailure { return it }
+        val updatedGame = game.makeMove(x, y).onFailure { return it }
+        return gameRepository.update(gameId, updatedGame)
     }
 
     private fun GameError.toResponse(): Response =

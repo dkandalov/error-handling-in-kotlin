@@ -1,11 +1,11 @@
 package tictactoe4k
 
 import arrow.core.Either
-import arrow.core.Either.Left
-import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
-import tictactoe4k.Player.*
+import dev.forkhandles.result4k.*
+import tictactoe4k.Player.O
+import tictactoe4k.Player.X
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -13,13 +13,13 @@ class GameRepository(
     private val gamesById: MutableMap<String, Game> = ConcurrentHashMap(),
     private val generateId: () -> String = { UUID.randomUUID().toString() },
 ) {
-    fun find(gameId: String): Either<GameError, Game> =
-        gamesById[gameId]?.right() ?: GameNotFound(gameId).left()
+    fun find(gameId: String): Result4k<Game, GameError> =
+        gamesById[gameId]?.asSuccess() ?: GameNotFound(gameId).asFailure()
 
-    fun update(gameId: String, game: Game): Either<GameError, Game> {
-        if (gameId !in gamesById.keys) return Left(GameNotFound(gameId))
+    fun update(gameId: String, game: Game): Result4k<Game, GameError> {
+        if (gameId !in gamesById.keys) return GameNotFound(gameId).asFailure()
         gamesById[gameId] = game
-        return Right(game)
+        return game.asSuccess()
     }
 
     fun add(game: Game): String {
@@ -29,14 +29,20 @@ class GameRepository(
     }
 }
 
+fun <T, E> Result4k<T, E>.toEither(): Either<E, T> =
+    when (this) {
+        is Failure<E> -> reason.left()
+        is Success<T> -> value.right()
+    }
+
 data class Game(val moves: List<Move> = emptyList()) {
-    fun makeMove(x: Int, y: Int): Either<GameError, Game> {
-        if (isOver) return Left(MoveAfterGameOver)
-        if (x !in 0..2 || y !in 0..2) return Left(OutOfRangeMove(x, y))
-        if (moves.any { it.x == x && it.y == y }) return Left(DuplicateMove(x, y))
+    fun makeMove(x: Int, y: Int): Result4k<Game, GameError> {
+        if (isOver) return MoveAfterGameOver.asFailure()
+        if (x !in 0..2 || y !in 0..2) return OutOfRangeMove(x, y).asFailure()
+        if (moves.any { it.x == x && it.y == y }) return DuplicateMove(x, y).asFailure()
 
         val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
-        return Right(Game(moves + Move(x, y, nextPlayer)))
+        return Game(moves + Move(x, y, nextPlayer)).asSuccess()
     }
 
     val winner: Player? = findWinner()
