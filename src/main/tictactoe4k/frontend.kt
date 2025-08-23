@@ -7,7 +7,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.bind
@@ -33,8 +32,8 @@ class Frontend(private val backend: HttpHandler) : HttpHandler {
     private val httpHandler =
         routes(
             "/" bind GET to { newGame() },
-            "/game/{gameId}" bind GET to { request -> getGame(request) },
-            "/game/{gameId}/move" bind GET to { request -> makeMove(request) }
+            "/game/{gameId}" bind GET to ::getGame,
+            "/game/{gameId}/move" bind GET to ::makeMove
         ).withFilter(ShowErrorPageOnException { htmlRenderer(ErrorView) })
 
     override fun invoke(request: Request) = httpHandler(request)
