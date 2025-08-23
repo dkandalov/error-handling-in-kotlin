@@ -7,9 +7,10 @@ import arrow.core.left
 import arrow.core.right
 import tictactoe4k.Player.*
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class GameRepository(
-    private val gamesById: MutableMap<String, Game> = HashMap(),
+    private val gamesById: MutableMap<String, Game> = ConcurrentHashMap(),
     private val generateId: () -> String = { UUID.randomUUID().toString() },
 ) {
     fun find(gameId: String): Either<GameError, Game> =
