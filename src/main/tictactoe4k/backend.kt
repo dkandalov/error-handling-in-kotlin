@@ -18,15 +18,6 @@ import org.http4k.format.Jackson
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import org.http4k.server.ApacheServer
-import org.http4k.server.asServer
-
-fun main() {
-    Backend(GameRepository())
-        .asServer(ApacheServer(port = 1234))
-        .start()
-    println("Started backend on http://localhost:1234")
-}
 
 class Backend(private val gameRepository: GameRepository) : HttpHandler {
     private val httpHandler =

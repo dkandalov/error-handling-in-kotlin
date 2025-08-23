@@ -1,30 +1,18 @@
 package tictactoe4k
 
-import org.http4k.client.OkHttp
 import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import org.http4k.server.ApacheServer
-import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 
-fun main() {
-    val backendClient = SetBaseUriFrom(Uri.of("http://localhost:1234")).then(OkHttp())
-    Frontend(backendClient)
-        .asServer(ApacheServer(port = 8080))
-        .start()
-
-    println("Started frontend on http://localhost:8080")
-}
 
 class Frontend(private val backend: HttpHandler) : HttpHandler {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
