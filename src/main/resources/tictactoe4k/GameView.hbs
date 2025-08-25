@@ -1,7 +1,9 @@
 <meta charset="UTF-8">
-<body style="font-family: 'Menlo',serif; font-size: 70px;">
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
 {{#each rows~}}
-    <p>
+    <p class="row">
         {{#each this}}
             {{~#if player~}}
                 {{player}}
@@ -21,4 +23,5 @@
     <br/>
     <a href="/">Start new game</a>?
 {{~/if~}}
+</div>
 </body>

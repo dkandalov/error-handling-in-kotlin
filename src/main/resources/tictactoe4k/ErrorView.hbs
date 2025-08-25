@@ -1,5 +1,11 @@
 <meta charset="UTF-8">
-<body style="font-family: 'Menlo',serif; font-size: 70px;">
-Something went wrong 😭<br/>
-<a href="/">Start new game</a>?
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
+    <p class="row">{{message}}.</p>
+    {{~#if gameId~}}
+        <p class="row">Return to <a href="/game/{{gameId}}">the game</a>?</p>
+    {{~/if~}}
+    <p class="row">Start <a href="/">new game</a>?</p>
+</div>
 </body>

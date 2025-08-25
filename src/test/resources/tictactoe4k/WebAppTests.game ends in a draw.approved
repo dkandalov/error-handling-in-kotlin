@@ -1,16 +1,18 @@
 <meta charset="UTF-8">
-<body style="font-family: 'Menlo',serif; font-size: 70px;">
-<p>
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
+<p class="row">
         O&nbsp;
         X&nbsp;
         O&nbsp;
         
-    </p><p>
+    </p><p class="row">
         X&nbsp;
         X&nbsp;
         O&nbsp;
         
-    </p><p>
+    </p><p class="row">
         X&nbsp;
         O&nbsp;
         X&nbsp;
@@ -18,4 +20,5 @@
     </p>
 It's a draw!
     <br/>
-    <a href="/">Start new game</a>?</body>
+    <a href="/">Start new game</a>?</div>
+</body>

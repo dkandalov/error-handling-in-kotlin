@@ -1,0 +1,7 @@
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
+    <p class="row">You can&#x27;t move twice x&#x3D;1, y&#x3D;1.</p><p class="row">Return to <a href="/game/some-game-id">the game</a>?</p><p class="row">Start <a href="/">new game</a>?</p>
+</div>
+</body>

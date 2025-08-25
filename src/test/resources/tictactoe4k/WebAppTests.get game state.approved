@@ -1,0 +1,22 @@
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
+<p class="row">
+        <a href="/game/some-game-id/move?x=0&y=0">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=0&y=1">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=0&y=2">_</a>&nbsp;
+        
+    </p><p class="row">
+        <a href="/game/some-game-id/move?x=1&y=0">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=1&y=1">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=1&y=2">_</a>&nbsp;
+        
+    </p><p class="row">
+        <a href="/game/some-game-id/move?x=2&y=0">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=2&y=1">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=2&y=2">_</a>&nbsp;
+        
+    </p>
+</div>
+</body>

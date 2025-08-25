@@ -1,0 +1,24 @@
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
+<p class="row">
+        X&nbsp;
+        X&nbsp;
+        X&nbsp;
+        
+    </p><p class="row">
+        O&nbsp;
+        O&nbsp;
+        <a href="/game/some-game-id/move?x=1&y=2">_</a>&nbsp;
+        
+    </p><p class="row">
+        <a href="/game/some-game-id/move?x=2&y=0">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=2&y=1">_</a>&nbsp;
+        <a href="/game/some-game-id/move?x=2&y=2">_</a>&nbsp;
+        
+    </p>
+X wins!! 🥳
+    <br/>
+    <a href="/">Start new game</a>?</div>
+</body>

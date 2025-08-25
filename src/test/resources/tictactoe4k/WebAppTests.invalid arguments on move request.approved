@@ -1,0 +1,7 @@
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/static/styles.css">
+<body>
+<div class="game">
+    <p class="row">Invalid or missing X.</p><p class="row">Return to <a href="/game/some-game-id">the game</a>?</p><p class="row">Start <a href="/">new game</a>?</p>
+</div>
+</body>
