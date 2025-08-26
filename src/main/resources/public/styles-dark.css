@@ -1,0 +1,29 @@
+body {
+    font-family: 'Menlo', serif;
+    font-size: 70px;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    color: #e5e7eb;
+}
+
+.game {
+    text-align: center;
+}
+
+.row {
+    line-height: 1.4;
+    margin: 0.1em 0;
+}
+
+a {
+    text-decoration: none;
+    color: #93c5fd;
+}
+
+a:hover {
+    color: #bfdbfe;
+}
