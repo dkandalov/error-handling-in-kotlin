@@ -35,7 +35,7 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
 
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId().onFailure { return it.toResponse() }
-        val game = app.find(gameId).onFailure { return it.toResponse() }
+        val game = app.findGame(gameId).onFailure { return it.toResponse() }
         return game.toView(gameId).toResponse()
     }
 

@@ -8,11 +8,11 @@ class TicTacToeApp(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
     private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
 ) {
-    fun find(id: GameId): Result4k<Game, GameError> =
+    fun findGame(id: GameId): Result4k<Game, GameError> =
         gamesById[id].asResultOr { GameNotFound(id) }
 
     fun makeMove(id: GameId, x: Int, y: Int): Result4k<Game, GameError> {
-        val game = find(id).onFailure { return it }
+        val game = findGame(id).onFailure { return it }
         val updatedGame = game.makeMove(x, y).onFailure { return it }
         return update(id, updatedGame)
     }

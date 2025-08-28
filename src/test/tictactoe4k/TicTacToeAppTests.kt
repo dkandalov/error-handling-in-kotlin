@@ -13,7 +13,7 @@ class TicTacToeAppTests {
     @Test fun `game can be looked up by id`() {
         val game = Game()
         val id = app.add(game)
-        expectThat(app.find(id)).isEqualTo(Success(game))
+        expectThat(app.findGame(id)).isEqualTo(Success(game))
     }
 
     @Test fun `added games have different ids`() {
@@ -29,12 +29,12 @@ class TicTacToeAppTests {
         app.makeMove(id1, 0, 0).expectSuccess()
         app.makeMove(id2, 1, 1).expectSuccess()
 
-        expectThat(app.find(id1)).isEqualTo(Game(listOf(Move(0, 0, X))).asSuccess())
-        expectThat(app.find(id2)).isEqualTo(Game(listOf(Move(1, 1, X))).asSuccess())
+        expectThat(app.findGame(id1)).isEqualTo(Game(listOf(Move(0, 0, X))).asSuccess())
+        expectThat(app.findGame(id2)).isEqualTo(Game(listOf(Move(1, 1, X))).asSuccess())
     }
 
     @Test fun `can't find non-existent game`() {
-        expectThat(app.find(GameId("non-existent-id")))
+        expectThat(app.findGame(GameId("non-existent-id")))
             .isEqualTo(GameNotFound(GameId("non-existent-id")).asFailure())
     }
 
