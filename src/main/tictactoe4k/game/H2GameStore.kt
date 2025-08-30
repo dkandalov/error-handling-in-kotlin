@@ -35,7 +35,7 @@ class H2GameStore(
         }
     }
 
-    override fun findBy(id: GameId): Game {
+    override fun findGame(id: GameId): Game {
         ensureGameExists(id)
         val moves = mutableListOf<Move>()
         useConnection { connection ->
@@ -61,7 +61,7 @@ class H2GameStore(
     }
 
     override fun makeMove(id: GameId, x: Int, y: Int) {
-        val updatedGame = findBy(id).makeMove(x, y)
+        val updatedGame = findGame(id).makeMove(x, y)
         update(id, updatedGame)
     }
 
@@ -93,8 +93,9 @@ class H2GameStore(
         }
     }
 
-    override fun add(game: Game): GameId {
+    override fun newGame(): GameId {
         val id = generateId()
+        val game = Game()
         useConnection { connection ->
             try {
                 connection.prepareStatement("insert into games(id) values (?)").use { ps ->

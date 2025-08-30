@@ -1,10 +1,10 @@
 package tictactoe4k.game
 
 interface GameStore {
-    fun findBy(id: GameId): Game
+    fun newGame(): GameId
+    fun findGame(id: GameId): Game
     fun makeMove(id: GameId, x: Int, y: Int)
     fun update(id: GameId, game: Game)
-    fun add(game: Game): GameId
 }
 
 @JvmInline

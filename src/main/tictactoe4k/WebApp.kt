@@ -30,13 +30,13 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
         httpHandler(request)
 
     private fun newGame(): Response {
-        val gameId = gameStore.add(Game())
+        val gameId = gameStore.newGame()
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId()
-        val game = gameStore.findBy(gameId)
+        val game = gameStore.findGame(gameId)
         return Response(OK).html(htmlRenderer(GameView(game, gameId)))
     }
 
