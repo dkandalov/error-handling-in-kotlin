@@ -121,34 +121,6 @@ class H2GameStore(
         }
     }
 
-    override fun update(id: GameId, game: Game) {
-        ensureGameExists(id)
-        useConnection { connection ->
-            try {
-                connection.prepareStatement("delete from moves where game_id = ?").use { ps ->
-                    ps.setString(1, id.value)
-                    ps.executeUpdate()
-                }
-                connection.prepareStatement(
-                    "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
-                ).use { ps ->
-                    game.moves.forEachIndexed { index, move ->
-                        ps.setString(1, id.value)
-                        ps.setInt(2, index)
-                        ps.setInt(3, move.x)
-                        ps.setInt(4, move.y)
-                        ps.setString(5, move.player.name)
-                        ps.addBatch()
-                    }
-                    ps.executeBatch()
-                }
-                connection.commit()
-            } catch (e: Exception) {
-                throw e
-            }
-        }
-    }
-
     private fun ensureGameExists(id: GameId) {
         val exists = useConnection { connection ->
             connection.prepareStatement("select 1 from games where id = ?").use { ps ->

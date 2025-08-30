@@ -21,8 +21,4 @@ class InMemoryGameStore(
         gamesById[id] = updatedGame
     }
 
-    override fun update(id: GameId, game: Game) {
-        if (id !in gamesById.keys) throw GameNotFound(id)
-        gamesById[id] = game
-    }
 }

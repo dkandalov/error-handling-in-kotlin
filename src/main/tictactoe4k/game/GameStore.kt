@@ -4,7 +4,6 @@ interface GameStore {
     fun newGame(): GameId
     fun findGame(id: GameId): Game
     fun makeMove(id: GameId, x: Int, y: Int)
-    fun update(id: GameId, game: Game)
 }
 
 @JvmInline
