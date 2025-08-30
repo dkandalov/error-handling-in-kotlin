@@ -10,16 +10,14 @@ class TicTacToeApp(
     fun findGame(id: GameId): Game =
         gamesById[id] ?: throw GameNotFound(id)
 
-    fun makeMove(id: GameId, x: Int, y: Int): Game {
-        val game = findGame(id)
-        val updatedGame = game.makeMove(x, y)
-        return update(id, updatedGame)
+    fun makeMove(id: GameId, x: Int, y: Int) {
+        val updatedGame = findGame(id).makeMove(x, y)
+        update(id, updatedGame)
     }
 
-    fun update(id: GameId, game: Game): Game {
+    fun update(id: GameId, game: Game) {
         if (id !in gamesById.keys) throw GameNotFound(id)
         gamesById[id] = game
-        return game
     }
 
     fun add(game: Game): GameId {
