@@ -62,6 +62,9 @@ class GameTests {
     @Test fun `can't make moves when the game is over`() {
         assertFailsWith<MoveAfterGameOver> { Game().makeMoves(playerXWinningMoves).makeMove(2, 2) }
     }
+
+    private fun Game.makeMoves(moves: List<Pair<Int, Int>>) =
+        moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }
 }
 
 val playerXWinningMoves = listOf(
@@ -83,9 +86,3 @@ val gameEndsInDrawMoves = listOf(
     Pair(2, 0), Pair(2, 1),
     Pair(2, 2)
 )
-
-fun GameStore.makeMoves(id: GameId, moves: List<Pair<Int, Int>>) =
-    moves.forEach { (x, y) -> makeMove(id, x, y) }
-
-fun Game.makeMoves(moves: List<Pair<Int, Int>>) =
-    moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }

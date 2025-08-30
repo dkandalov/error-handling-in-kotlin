@@ -14,6 +14,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import tictactoe4k.game.Game
 import tictactoe4k.game.GameId
+import tictactoe4k.game.GameStore
 import tictactoe4k.game.InMemoryGameStore
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -91,4 +92,7 @@ class WebAppTests {
         val id = AtomicInteger()
         return { GameId(id.incrementAndGet().toString()) }
     }
+
+    private fun GameStore.makeMoves(id: GameId, moves: List<Pair<Int, Int>>) =
+        moves.forEach { (x, y) -> makeMove(id, x, y) }
 }
