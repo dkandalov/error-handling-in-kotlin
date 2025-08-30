@@ -1,8 +1,5 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.asResultOr
-import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -35,33 +32,28 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
     }
 
     private fun findGame(request: Request): Response {
-        val gameId = request.parseGameId().onFailure { return it.toResponse() }
+        val gameId = request.parseGameId()
         val game = app.findGame(gameId)
         return Response(OK).html(htmlRenderer(game.toView(gameId)))
     }
 
     private fun makeMove(request: Request): Response {
-        val gameId = request.parseGameId().onFailure { return it.toResponse() }
-        val x = request.parseX().onFailure { return it.toResponse(gameId) }
-        val y = request.parseY().onFailure { return it.toResponse(gameId) }
+        val gameId = request.parseGameId()
+        val x = request.parseX()
+        val y = request.parseY()
 
         app.makeMove(gameId, x, y)
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
-    private fun Failure<ParsingError>.toResponse(gameId: GameId? = null) =
-        Response(OK).html(htmlRenderer(ErrorView("Invalid or missing ${reason.message}", gameId?.value)))
-
     private fun Request.parseX() =
-        query("x")?.toIntOrNull().asResultOr { ParsingError("X") }
+        query("x")!!.toInt()
 
     private fun Request.parseY() =
-        query("y")?.toIntOrNull().asResultOr { ParsingError("Y") }
+        query("y")!!.toInt()
 
     private fun Request.parseGameId() =
-        path("gameId")?.let(::GameId).asResultOr { ParsingError("game id") }
-
-    private data class ParsingError(val message: String)
+        path("gameId")!!.let(::GameId)
 
     private fun Game.toView(gameId: GameId) =
         GameView(
@@ -97,5 +89,3 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
         }
     }
 }
-
-private class FailedToParseRequest(override val message: String) : Exception(message)
