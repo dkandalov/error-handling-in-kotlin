@@ -12,6 +12,9 @@ import org.http4k.routing.*
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
+import tictactoe4k.game.Game
+import tictactoe4k.game.GameId
+import tictactoe4k.game.GameStore
 
 class WebApp(val gameStore: GameStore) : HttpHandler {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")

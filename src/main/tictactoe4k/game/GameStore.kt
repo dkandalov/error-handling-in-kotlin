@@ -1,4 +1,4 @@
-package tictactoe4k
+package tictactoe4k.game
 
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -9,6 +9,13 @@ interface GameStore {
     fun update(id: GameId, game: Game)
     fun add(game: Game): GameId
 }
+
+@JvmInline
+value class GameId(val value: String) {
+    override fun toString() = value
+}
+
+data class GameNotFound(val id: GameId) : GameException("Game not found: $id")
 
 class InMemoryGameStore(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
@@ -32,11 +39,4 @@ class InMemoryGameStore(
         gamesById[id] = game
         return id
     }
-}
-
-data class GameNotFound(val id: GameId) : GameException("Game not found: $id")
-
-@JvmInline
-value class GameId(val value: String) {
-    override fun toString() = value
 }

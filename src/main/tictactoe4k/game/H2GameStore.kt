@@ -1,11 +1,12 @@
-package tictactoe4k
+package tictactoe4k.game
 
 import java.sql.Connection
 import java.sql.DriverManager
+import java.util.*
 
 class H2GameStore(
     private val jdbcUrl: String,
-    private val generateId: () -> GameId = { GameId(java.util.UUID.randomUUID().toString()) },
+    private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
 ) : GameStore {
     init {
         useConnection { connection ->

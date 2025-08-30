@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import tictactoe4k.game.Game
+import tictactoe4k.game.GameId
+import tictactoe4k.game.InMemoryGameStore
 import java.util.concurrent.atomic.AtomicInteger
 
 @ExtendWith(ApprovalTest::class)

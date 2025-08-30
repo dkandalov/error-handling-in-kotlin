@@ -5,6 +5,12 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isTrue
+import tictactoe4k.game.DuplicateMove
+import tictactoe4k.game.Game
+import tictactoe4k.game.Move
+import tictactoe4k.game.MoveAfterGameOver
+import tictactoe4k.game.OutOfRangeMove
+import tictactoe4k.game.Player
 import kotlin.test.assertFailsWith
 
 class GameTests {

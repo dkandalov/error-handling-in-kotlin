@@ -1,7 +1,7 @@
-package tictactoe4k
+package tictactoe4k.game
 
-import tictactoe4k.Player.O
-import tictactoe4k.Player.X
+import tictactoe4k.game.Player.O
+import tictactoe4k.game.Player.X
 
 data class Game(val moves: List<Move> = emptyList()) {
     fun makeMove(x: Int, y: Int): Game {

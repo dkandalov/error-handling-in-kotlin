@@ -4,7 +4,14 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotEqualTo
-import tictactoe4k.Player.X
+import tictactoe4k.game.Game
+import tictactoe4k.game.GameId
+import tictactoe4k.game.GameNotFound
+import tictactoe4k.game.GameStore
+import tictactoe4k.game.H2GameStore
+import tictactoe4k.game.InMemoryGameStore
+import tictactoe4k.game.Move
+import tictactoe4k.game.Player.X
 import kotlin.test.assertFailsWith
 
 class InMemoryGameStoreTests: GameStoreTests(InMemoryGameStore())
