@@ -26,19 +26,19 @@ class GameTests {
     }
 
     @Test fun `player X wins`() {
-        val game = Game().with(playerXWinningMoves)
+        val game = Game().makeMoves(playerXWinningMoves)
         expectThat(game.winner).isEqualTo(Player.X)
         expectThat(game.isOver).isTrue()
     }
 
     @Test fun `player O wins`() {
-        val game = Game().with(playerOWinningMoves)
+        val game = Game().makeMoves(playerOWinningMoves)
         expectThat(game.winner).isEqualTo(Player.O)
         expectThat(game.isOver).isTrue()
     }
 
     @Test fun `game ends in a draw`() {
-        val game = Game().with(gameEndsInDrawMoves)
+        val game = Game().makeMoves(gameEndsInDrawMoves)
         expectThat(game.winner).isEqualTo(null)
         expectThat(game.isOver).isTrue()
     }
@@ -60,7 +60,7 @@ class GameTests {
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves when the game is over`() {
-        assertFailsWith<MoveAfterGameOver> { Game().with(playerXWinningMoves).makeMove(2, 2) }
+        assertFailsWith<MoveAfterGameOver> { Game().makeMoves(playerXWinningMoves).makeMove(2, 2) }
     }
 }
 
@@ -84,5 +84,8 @@ val gameEndsInDrawMoves = listOf(
     Pair(2, 2)
 )
 
-fun Game.with(moves: List<Pair<Int, Int>>) =
+fun GameStore.makeMoves(id: GameId, moves: List<Pair<Int, Int>>) =
+    moves.forEach { (x, y) -> makeMove(id, x, y) }
+
+fun Game.makeMoves(moves: List<Pair<Int, Int>>) =
     moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }
