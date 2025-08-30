@@ -34,39 +34,20 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId()
         val game = gameStore.findBy(gameId)
-        return Response(OK).html(htmlRenderer(game.toView(gameId)))
+        return Response(OK).html(htmlRenderer(GameView(game, gameId)))
     }
 
     private fun makeMove(request: Request): Response {
         val gameId = request.parseGameId()
-        val x = request.parseX()
-        val y = request.parseY()
+        val x = request.query("x")!!.toInt()
+        val y = request.query("y")!!.toInt()
 
         gameStore.makeMove(gameId, x, y)
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
-    private fun Request.parseX() =
-        query("x")!!.toInt()
-
-    private fun Request.parseY() =
-        query("y")!!.toInt()
-
     private fun Request.parseGameId() =
         path("gameId")!!.let(::GameId)
-
-    private fun Game.toView(gameId: GameId) =
-        GameView(
-            gameId = gameId.value,
-            rows = (0..2).map { x ->
-                (0..2).map { y ->
-                    val player = moves.find { it.x == x && it.y == y }?.player?.name
-                    CellView(x, y, player)
-                }
-            },
-            winner = winner?.name,
-            isOver = isOver
-        )
 }
 
 private class GameView(
@@ -75,6 +56,19 @@ private class GameView(
     val winner: String?,
     val isOver: Boolean,
 ) : ViewModel
+
+private fun GameView(game: Game, gameId: GameId) =
+    GameView(
+        gameId = gameId.value,
+        rows = (0..2).map { x ->
+            (0..2).map { y ->
+                val player = game.moves.find { it.x == x && it.y == y }?.player?.name
+                CellView(x, y, player)
+            }
+        },
+        winner = game.winner?.name,
+        isOver = game.isOver
+    )
 
 private class CellView(val x: Int, val y: Int, val player: String?)
 
