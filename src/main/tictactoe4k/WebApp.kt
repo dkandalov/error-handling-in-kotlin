@@ -80,10 +80,11 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
 
     private fun Game.toView(gameId: GameId) =
         GameView(
+            gameId = gameId.value,
             rows = (0..2).map { x ->
                 (0..2).map { y ->
                     val player = moves.find { it.x == x && it.y == y }?.player?.name
-                    CellView(x, y, gameId.value, player)
+                    CellView(x, y, player)
                 }
             },
             winner = winner?.name,
@@ -92,12 +93,13 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
 }
 
 private class GameView(
+    val gameId: String,
     val rows: List<List<CellView>>,
     val winner: String?,
     val isOver: Boolean,
 ) : ViewModel
 
-private class CellView(val x: Int, val y: Int, val gameId: String, val player: String?)
+private class CellView(val x: Int, val y: Int, val player: String?)
 
 private class ErrorView(val message: String, val gameId: String? = null) : ViewModel
 
