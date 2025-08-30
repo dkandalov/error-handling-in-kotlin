@@ -35,6 +35,38 @@ class H2GameStore(
         }
     }
 
+    override fun newGame(): GameId {
+        val id = generateId()
+        val game = Game()
+        useConnection { connection ->
+            try {
+                connection.prepareStatement("insert into games(id) values (?)").use { ps ->
+                    ps.setString(1, id.value)
+                    ps.executeUpdate()
+                }
+                if (game.moves.isNotEmpty()) {
+                    connection.prepareStatement(
+                        "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
+                    ).use { ps ->
+                        game.moves.forEachIndexed { index, move ->
+                            ps.setString(1, id.value)
+                            ps.setInt(2, index)
+                            ps.setInt(3, move.x)
+                            ps.setInt(4, move.y)
+                            ps.setString(5, move.player.name)
+                            ps.addBatch()
+                        }
+                        ps.executeBatch()
+                    }
+                }
+                connection.commit()
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+        return id
+    }
+
     override fun findGame(id: GameId): Game {
         ensureGameExists(id)
         val moves = mutableListOf<Move>()
@@ -91,38 +123,6 @@ class H2GameStore(
                 throw e
             }
         }
-    }
-
-    override fun newGame(): GameId {
-        val id = generateId()
-        val game = Game()
-        useConnection { connection ->
-            try {
-                connection.prepareStatement("insert into games(id) values (?)").use { ps ->
-                    ps.setString(1, id.value)
-                    ps.executeUpdate()
-                }
-                if (game.moves.isNotEmpty()) {
-                    connection.prepareStatement(
-                        "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
-                    ).use { ps ->
-                        game.moves.forEachIndexed { index, move ->
-                            ps.setString(1, id.value)
-                            ps.setInt(2, index)
-                            ps.setInt(3, move.x)
-                            ps.setInt(4, move.y)
-                            ps.setString(5, move.player.name)
-                            ps.addBatch()
-                        }
-                        ps.executeBatch()
-                    }
-                }
-                connection.commit()
-            } catch (e: Exception) {
-                throw e
-            }
-        }
-        return id
     }
 
     private fun ensureGameExists(id: GameId) {
