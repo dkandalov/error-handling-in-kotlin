@@ -95,24 +95,22 @@ class H2GameStore(
 
     override fun makeMove(id: GameId, x: Int, y: Int) {
         val updatedGame = findGame(id).makeMove(x, y)
+        val newMove = updatedGame.moves.last()
         useConnection { connection ->
             try {
-                connection.prepareStatement("delete from moves where game_id = ?").use<PreparedStatement, Int> { ps ->
+                val nextSeq = connection.prepareStatement("select max(seq) from moves where game_id = ?").use { ps ->
                     ps.setString(1, id.value)
-                    ps.executeUpdate()
-                }
+                    ps.executeQuery().use { rs -> if (rs.next()) rs.getInt(1).let { if (rs.wasNull()) -1 else it } else -1 }
+                } + 1
                 connection.prepareStatement(
                     "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
-                ).use<PreparedStatement, IntArray> { ps ->
-                    updatedGame.moves.forEachIndexed<Move> { index, move ->
-                        ps.setString(1, id.value)
-                        ps.setInt(2, index)
-                        ps.setInt(3, move.x)
-                        ps.setInt(4, move.y)
-                        ps.setString(5, move.player.name)
-                        ps.addBatch()
-                    }
-                    ps.executeBatch()
+                ).use { ps ->
+                    ps.setString(1, id.value)
+                    ps.setInt(2, nextSeq)
+                    ps.setInt(3, newMove.x)
+                    ps.setInt(4, newMove.y)
+                    ps.setString(5, newMove.player.name)
+                    ps.executeUpdate()
                 }
                 connection.commit()
             } catch (e: Exception) {
