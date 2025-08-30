@@ -8,7 +8,7 @@ import tictactoe4k.Player.X
 import kotlin.test.assertFailsWith
 
 class GameStoreTests {
-    private val store = GameStore()
+    private val store = InMemoryGameStore()
 
     @Test fun `game can be looked up by id`() {
         val game = Game()

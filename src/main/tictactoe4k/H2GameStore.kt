@@ -6,7 +6,7 @@ import java.sql.DriverManager
 class H2GameStore(
     private val jdbcUrl: String,
     private val generateId: () -> GameId = { GameId(java.util.UUID.randomUUID().toString()) },
-) {
+) : GameStore {
     init {
         useConnection { connection ->
             connection.createStatement().use { st ->
@@ -34,7 +34,7 @@ class H2GameStore(
         }
     }
 
-    fun findBy(id: GameId): Game {
+    override fun findBy(id: GameId): Game {
         ensureGameExists(id)
         val moves = mutableListOf<Move>()
         useConnection { connection ->
@@ -59,12 +59,12 @@ class H2GameStore(
         return Game(moves)
     }
 
-    fun makeMove(id: GameId, x: Int, y: Int) {
+    override fun makeMove(id: GameId, x: Int, y: Int) {
         val updatedGame = findBy(id).makeMove(x, y)
         update(id, updatedGame)
     }
 
-    fun update(id: GameId, game: Game) {
+    override fun update(id: GameId, game: Game) {
         ensureGameExists(id)
         useConnection { connection ->
             connection.autoCommit = false
@@ -96,7 +96,7 @@ class H2GameStore(
         }
     }
 
-    fun add(game: Game): GameId {
+    override fun add(game: Game): GameId {
         val id = generateId()
         useConnection { connection ->
             connection.autoCommit = false

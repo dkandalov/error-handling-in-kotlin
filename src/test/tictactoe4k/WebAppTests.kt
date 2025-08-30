@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @ExtendWith(ApprovalTest::class)
 class WebAppTests {
     private val id = "some-game-id"
-    private val gameStore = GameStore(
+    private val gameStore = InMemoryGameStore(
         gamesById = mutableMapOf(GameId(id) to Game()),
         generateId = generateSequentialIds()
     )
