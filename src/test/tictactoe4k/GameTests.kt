@@ -5,12 +5,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isTrue
-import tictactoe4k.game.DuplicateMove
-import tictactoe4k.game.Game
-import tictactoe4k.game.Move
-import tictactoe4k.game.MoveAfterGameOver
-import tictactoe4k.game.OutOfRangeMove
-import tictactoe4k.game.Player
+import tictactoe4k.game.*
 import kotlin.test.assertFailsWith
 
 class GameTests {
@@ -31,19 +26,19 @@ class GameTests {
     }
 
     @Test fun `player X wins`() {
-        val game = gameWonByPlayerX()
+        val game = Game().with(playerXWinningMoves)
         expectThat(game.winner).isEqualTo(Player.X)
         expectThat(game.isOver).isTrue()
     }
 
     @Test fun `player O wins`() {
-        val game = gameWonByPlayerO()
+        val game = Game().with(playerOWinningMoves)
         expectThat(game.winner).isEqualTo(Player.O)
         expectThat(game.isOver).isTrue()
     }
 
     @Test fun `game ends in a draw`() {
-        val game = gameEndsInDraw()
+        val game = Game().with(gameEndsInDrawMoves)
         expectThat(game.winner).isEqualTo(null)
         expectThat(game.isOver).isTrue()
     }
@@ -65,35 +60,29 @@ class GameTests {
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves when the game is over`() {
-        assertFailsWith<MoveAfterGameOver> { gameWonByPlayerX().makeMove(2, 2) }
+        assertFailsWith<MoveAfterGameOver> { Game().with(playerXWinningMoves).makeMove(2, 2) }
     }
 }
 
-fun gameWonByPlayerX() =
-    listOf(
-        Pair(0, 0), Pair(1, 0),
-        Pair(0, 1), Pair(1, 1),
-        Pair(0, 2)
-    ).fold(Game()) { game, (x, y) ->
-        game.makeMove(x, y)
-    }
+val playerXWinningMoves = listOf(
+    Pair(0, 0), Pair(1, 0),
+    Pair(0, 1), Pair(1, 1),
+    Pair(0, 2)
+)
 
-fun gameWonByPlayerO() =
-    listOf(
-        Pair(0, 1), Pair(0, 0),
-        Pair(0, 2), Pair(1, 1),
-        Pair(1, 0), Pair(2, 2)
-    ).fold(Game()) { game, (x, y) ->
-        game.makeMove(x, y)
-    }
+val playerOWinningMoves = listOf(
+    Pair(0, 1), Pair(0, 0),
+    Pair(0, 2), Pair(1, 1),
+    Pair(1, 0), Pair(2, 2)
+)
 
-fun gameEndsInDraw() =
-    listOf(
-        Pair(1, 1), Pair(0, 0),
-        Pair(0, 1), Pair(0, 2),
-        Pair(1, 0), Pair(1, 2),
-        Pair(2, 0), Pair(2, 1),
-        Pair(2, 2)
-    ).fold(Game()) { game, (x, y) ->
-        game.makeMove(x, y)
-    }
+fun Game.with(moves: List<Pair<Int, Int>>) =
+    moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }
+
+val gameEndsInDrawMoves = listOf(
+    Pair(1, 1), Pair(0, 0),
+    Pair(0, 1), Pair(0, 2),
+    Pair(1, 0), Pair(1, 2),
+    Pair(2, 0), Pair(2, 1),
+    Pair(2, 2)
+)

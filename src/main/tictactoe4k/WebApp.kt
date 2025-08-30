@@ -78,9 +78,9 @@ private class CellView(val x: Int, val y: Int, val player: String?)
 private class ErrorView(val message: String, val gameId: String? = null) : ViewModel
 
 private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRenderer) : Filter {
-    override fun invoke(httpHandler: HttpHandler): HttpHandler = { request ->
+    override fun invoke(handler: HttpHandler): HttpHandler = { request ->
         try {
-            httpHandler(request)
+            handler(request)
         } catch (e: Exception) {
             Response(OK).html(htmlRenderer(ErrorView(message = "Something went wrong 😭")))
         }
