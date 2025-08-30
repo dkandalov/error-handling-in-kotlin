@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="main" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="tictactoe4k.MainKt" />
+    <module name="error-handling-in-kotlin.main" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
