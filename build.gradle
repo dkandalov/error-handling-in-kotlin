@@ -19,6 +19,7 @@ dependencies {
     implementation "org.http4k:http4k-template-handlebars"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation "org.slf4j:slf4j-nop:2.0.17" // Suppress log warnings from handlebars
+    implementation "com.h2database:h2:2.3.232"
 	implementation "dev.forkhandles:result4k:2.22.4.0"
     implementation "io.arrow-kt:arrow-core:2.1.2"
     testImplementation "io.strikt:strikt-core:0.35.1"
