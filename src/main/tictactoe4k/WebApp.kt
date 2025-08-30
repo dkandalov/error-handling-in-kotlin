@@ -3,12 +3,13 @@ package tictactoe4k
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.asResultOr
 import dev.forkhandles.result4k.onFailure
-import org.http4k.core.*
-import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.html
 import org.http4k.routing.*
 import org.http4k.template.HandlebarsTemplates
@@ -35,12 +36,8 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
 
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId().onFailure { return it.toResponse() }
-        return try {
-            val game = app.findGame(gameId)
-            game.toView(gameId).toResponse(htmlRenderer)
-        } catch (e: Exception) {
-            e.toResponse()
-        }
+        val game = app.findGame(gameId)
+        return Response(OK).html(htmlRenderer(game.toView(gameId)))
     }
 
     private fun makeMove(request: Request): Response {
@@ -48,31 +45,12 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
         val x = request.parseX().onFailure { return it.toResponse(gameId) }
         val y = request.parseY().onFailure { return it.toResponse(gameId) }
 
-        return try {
-            app.makeMove(gameId, x, y)
-            Response(SEE_OTHER).header("Location", "/game/$gameId")
-        } catch (e: Exception) {
-            e.toResponse(gameId)
-        }
+        app.makeMove(gameId, x, y)
+        return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
     private fun Failure<ParsingError>.toResponse(gameId: GameId? = null) =
-        ErrorView("Invalid or missing ${reason.message}", gameId?.value).toResponse(htmlRenderer)
-
-    private fun Exception.toResponse(gameId: GameId? = null) =
-        ErrorView(
-            message = when (val it = this) {
-                is MoveAfterGameOver -> "You can't move after the game is over"
-                is OutOfRangeMove -> "The move was out of range x=${it.x}, y=${it.y}"
-                is DuplicateMove -> "You can't move twice x=${it.x}, y=${it.y}"
-                is GameNotFound -> "Game not found"
-                else -> "Something went wrong 😭"
-            },
-            gameId = gameId?.value
-        ).toResponse(htmlRenderer)
-
-    private fun ViewModel.toResponse(htmlRenderer: TemplateRenderer) =
-        Response(OK).html(htmlRenderer(this))
+        Response(OK).html(htmlRenderer(ErrorView("Invalid or missing ${reason.message}", gameId?.value)))
 
     private fun Request.parseX() =
         query("x")?.toIntOrNull().asResultOr { ParsingError("X") }
@@ -115,9 +93,7 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
         try {
             httpHandler(request)
         } catch (e: Exception) {
-            Response(OK)
-                .body(htmlRenderer(ErrorView("Something went wrong 😭")))
-                .with(CONTENT_TYPE of TEXT_HTML)
+            Response(OK).html(htmlRenderer(ErrorView(message = "Something went wrong 😭")))
         }
     }
 }
