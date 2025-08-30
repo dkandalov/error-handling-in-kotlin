@@ -3,7 +3,7 @@ package tictactoe4k
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class TicTacToeApp(
+class GameStore(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
     private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
 ) {

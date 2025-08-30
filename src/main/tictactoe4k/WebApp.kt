@@ -13,7 +13,7 @@ import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 
-class WebApp(val app: TicTacToeApp) : HttpHandler {
+class WebApp(val gameStore: GameStore) : HttpHandler {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
     private val httpHandler =
         routes(
@@ -27,13 +27,13 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
         httpHandler(request)
 
     private fun newGame(): Response {
-        val gameId = app.add(Game())
+        val gameId = gameStore.add(Game())
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId()
-        val game = app.findGame(gameId)
+        val game = gameStore.findGame(gameId)
         return Response(OK).html(htmlRenderer(game.toView(gameId)))
     }
 
@@ -42,7 +42,7 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
         val x = request.parseX()
         val y = request.parseY()
 
-        app.makeMove(gameId, x, y)
+        gameStore.makeMove(gameId, x, y)
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 

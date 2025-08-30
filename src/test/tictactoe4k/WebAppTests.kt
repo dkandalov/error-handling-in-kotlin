@@ -17,12 +17,12 @@ import java.util.concurrent.atomic.AtomicInteger
 @ExtendWith(ApprovalTest::class)
 class WebAppTests {
     private val id = "some-game-id"
-    private val ticTacToeApp = TicTacToeApp(
+    private val gameStore = GameStore(
         gamesById = mutableMapOf(GameId(id) to Game()),
         generateId = generateSequentialIds()
     )
     private val webApp = ClientFilters.FollowRedirects().then(
-        WebApp(ticTacToeApp)
+        WebApp(gameStore)
     )
 
     @Test fun `create new game`(approver: Approver) {
@@ -47,17 +47,17 @@ class WebAppTests {
     }
 
     @Test fun `player X wins`(approver: Approver) {
-        ticTacToeApp.update(GameId(id), gameWonByPlayerX())
+        gameStore.update(GameId(id), gameWonByPlayerX())
         approver.assertApproved(webApp(Request(GET, "/game/$id")).expectOK())
     }
 
     @Test fun `game ends in a draw`(approver: Approver) {
-        ticTacToeApp.update(GameId(id), gameEndsInDraw())
+        gameStore.update(GameId(id), gameEndsInDraw())
         approver.assertApproved(webApp(Request(GET, "/game/$id")).expectOK())
     }
 
     @Test fun `can't make moves after game is over`(approver: Approver) {
-        ticTacToeApp.update(GameId(id), gameWonByPlayerX())
+        gameStore.update(GameId(id), gameWonByPlayerX())
         approver.assertApproved(webApp(Request(GET, "/game/$id/move?x=1&y=1")).expectOK())
     }
 

@@ -4,6 +4,6 @@ import org.http4k.server.Jetty11
 import org.http4k.server.asServer
 
 fun main() {
-    WebApp(TicTacToeApp()).asServer(Jetty11(port = 8080)).start()
+    WebApp().asServer(Jetty11(port = 8080)).start()
     println("Started web server on http://localhost:8080")
 }
