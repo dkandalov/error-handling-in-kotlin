@@ -10,7 +10,7 @@ import kotlin.test.assertFailsWith
 
 class InMemoryGameStoreTests: GameStoreTests(InMemoryGameStore())
 
-class H2GameStoreTests: GameStoreTests(H2GameStore("jdbc:h2:mem:tictactoe_test;DB_CLOSE_DELAY=-1"))
+class H2GameStoreTests: GameStoreTests(H2GameStore("jdbc:h2:mem:tictactoe_test;DB_CLOSE_DELAY=-1").init())
 
 abstract class GameStoreTests(private val store: GameStore) {
 

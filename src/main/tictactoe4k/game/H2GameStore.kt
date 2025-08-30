@@ -8,7 +8,7 @@ class H2GameStore(
     private val jdbcUrl: String,
     private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
 ) : GameStore {
-    init {
+    fun init() = apply {
         useConnection { connection ->
             connection.createStatement().use { st ->
                 st.executeUpdate(
