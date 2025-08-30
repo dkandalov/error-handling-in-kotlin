@@ -20,5 +20,4 @@ class InMemoryGameStore(
         val updatedGame = findGame(id).makeMove(x, y)
         gamesById[id] = updatedGame
     }
-
 }
