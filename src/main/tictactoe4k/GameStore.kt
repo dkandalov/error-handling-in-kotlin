@@ -7,11 +7,11 @@ class GameStore(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
     private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
 ) {
-    fun findGame(id: GameId): Game =
+    fun findBy(id: GameId): Game =
         gamesById[id] ?: throw GameNotFound(id)
 
     fun makeMove(id: GameId, x: Int, y: Int) {
-        val updatedGame = findGame(id).makeMove(x, y)
+        val updatedGame = findBy(id).makeMove(x, y)
         update(id, updatedGame)
     }
 

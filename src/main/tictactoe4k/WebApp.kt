@@ -13,7 +13,7 @@ import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 
-class WebApp(val gameStore: GameStore) : HttpHandler {
+class WebApp(val gameStore: GameStore = GameStore()) : HttpHandler {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
     private val httpHandler =
         routes(
@@ -33,7 +33,7 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
 
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId()
-        val game = gameStore.findGame(gameId)
+        val game = gameStore.findBy(gameId)
         return Response(OK).html(htmlRenderer(game.toView(gameId)))
     }
 

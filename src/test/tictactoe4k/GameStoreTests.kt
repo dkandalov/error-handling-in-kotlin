@@ -13,7 +13,7 @@ class GameStoreTests {
     @Test fun `game can be looked up by id`() {
         val game = Game()
         val id = store.add(game)
-        expectThat(store.findGame(id)).isEqualTo(game)
+        expectThat(store.findBy(id)).isEqualTo(game)
     }
 
     @Test fun `added games have different ids`() {
@@ -30,13 +30,13 @@ class GameStoreTests {
         store.makeMove(id1, 0, 0)
         store.makeMove(id2, 1, 1)
 
-        expectThat(store.findGame(id1)).isEqualTo(Game(listOf(Move(0, 0, X))))
-        expectThat(store.findGame(id2)).isEqualTo(Game(listOf(Move(1, 1, X))))
+        expectThat(store.findBy(id1)).isEqualTo(Game(listOf(Move(0, 0, X))))
+        expectThat(store.findBy(id2)).isEqualTo(Game(listOf(Move(1, 1, X))))
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't find non-existent game`() {
-        assertFailsWith<GameNotFound> { store.findGame(GameId("non-existent-id")) }
+        assertFailsWith<GameNotFound> { store.findBy(GameId("non-existent-id")) }
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
