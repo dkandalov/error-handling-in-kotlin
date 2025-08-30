@@ -7,8 +7,11 @@ import strikt.assertions.isNotEqualTo
 import tictactoe4k.Player.X
 import kotlin.test.assertFailsWith
 
-class GameStoreTests {
-    private val store = InMemoryGameStore()
+class InMemoryGameStoreTests: GameStoreTests(InMemoryGameStore())
+
+class H2GameStoreTests: GameStoreTests(H2GameStore("jdbc:h2:mem:tictactoe_test;DB_CLOSE_DELAY=-1"))
+
+abstract class GameStoreTests(private val store: GameStore) {
 
     @Test fun `game can be looked up by id`() {
         val game = Game()
