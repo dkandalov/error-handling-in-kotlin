@@ -18,7 +18,7 @@ class InMemoryGameStore(
 
     override fun makeMove(id: GameId, x: Int, y: Int) {
         val updatedGame = findGame(id).makeMove(x, y)
-        update(id, updatedGame)
+        gamesById[id] = updatedGame
     }
 
     override fun update(id: GameId, game: Game) {
