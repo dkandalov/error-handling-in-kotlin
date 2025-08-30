@@ -1,18 +1,18 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.asFailure
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isTrue
+import kotlin.test.assertFailsWith
 
 class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
-            Game().makeMove(0, 1).expectSuccess()
-                .makeMove(2, 0).expectSuccess()
-                .makeMove(2, 1).expectSuccess()
+            Game().makeMove(0, 1)
+                .makeMove(2, 0)
+                .makeMove(2, 1)
 
         expectThat(updatedGame.moves).isEqualTo(
             listOf(
@@ -42,22 +42,24 @@ class GameTests {
         expectThat(game.isOver).isTrue()
     }
 
+    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make the same move twice`() {
         val game = Game()
-            .makeMove(0, 0).expectSuccess()
-            .makeMove(1, 1).expectSuccess()
+            .makeMove(0, 0)
+            .makeMove(1, 1)
 
-        expectThat(game.makeMove(0, 0)).isEqualTo(DuplicateMove(0, 0).asFailure())
+        assertFailsWith<DuplicateMove> { game.makeMove(0, 0) }
     }
 
+    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves outside of the board`() {
-        expectThat(Game().makeMove(-1, 0)).isEqualTo(OutOfRangeMove(-1, 0).asFailure())
-        expectThat(Game().makeMove(0, 3)).isEqualTo(OutOfRangeMove(0, 3).asFailure())
+        assertFailsWith<OutOfRangeMove> { Game().makeMove(-1, 0) }
+        assertFailsWith<OutOfRangeMove> { Game().makeMove(0, 3) }
     }
 
+    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves when the game is over`() {
-        expectThat(gameWonByPlayerX().makeMove(2, 2))
-            .isEqualTo(MoveAfterGameOver.asFailure())
+        assertFailsWith<MoveAfterGameOver> { gameWonByPlayerX().makeMove(2, 2) }
     }
 }
 
@@ -67,7 +69,7 @@ fun gameWonByPlayerX() =
         Pair(0, 1), Pair(1, 1),
         Pair(0, 2)
     ).fold(Game()) { game, (x, y) ->
-        game.makeMove(x, y).expectSuccess()
+        game.makeMove(x, y)
     }
 
 fun gameWonByPlayerO() =
@@ -76,7 +78,7 @@ fun gameWonByPlayerO() =
         Pair(0, 2), Pair(1, 1),
         Pair(1, 0), Pair(2, 2)
     ).fold(Game()) { game, (x, y) ->
-        game.makeMove(x, y).expectSuccess()
+        game.makeMove(x, y)
     }
 
 fun gameEndsInDraw() =
@@ -87,5 +89,5 @@ fun gameEndsInDraw() =
         Pair(2, 0), Pair(2, 1),
         Pair(2, 2)
     ).fold(Game()) { game, (x, y) ->
-        game.makeMove(x, y).expectSuccess()
+        game.makeMove(x, y)
     }

@@ -47,17 +47,17 @@ class WebAppTests {
     }
 
     @Test fun `player X wins`(approver: Approver) {
-        ticTacToeApp.update(GameId(id), gameWonByPlayerX()).expectSuccess()
+        ticTacToeApp.update(GameId(id), gameWonByPlayerX())
         approver.assertApproved(webApp(Request(GET, "/game/$id")).expectOK())
     }
 
     @Test fun `game ends in a draw`(approver: Approver) {
-        ticTacToeApp.update(GameId(id), gameEndsInDraw()).expectSuccess()
+        ticTacToeApp.update(GameId(id), gameEndsInDraw())
         approver.assertApproved(webApp(Request(GET, "/game/$id")).expectOK())
     }
 
     @Test fun `can't make moves after game is over`(approver: Approver) {
-        ticTacToeApp.update(GameId(id), gameWonByPlayerX()).expectSuccess()
+        ticTacToeApp.update(GameId(id), gameWonByPlayerX())
         approver.assertApproved(webApp(Request(GET, "/game/$id/move?x=1&y=1")).expectOK())
     }
 

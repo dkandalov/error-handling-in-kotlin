@@ -35,8 +35,12 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
 
     private fun findGame(request: Request): Response {
         val gameId = request.parseGameId().onFailure { return it.toResponse() }
-        val game = app.findGame(gameId).onFailure { return it.toResponse() }
-        return game.toView(gameId).toResponse()
+        return try {
+            val game = app.findGame(gameId)
+            game.toView(gameId).toResponse(htmlRenderer)
+        } catch (e: Exception) {
+            e.toResponse()
+        }
     }
 
     private fun makeMove(request: Request): Response {
@@ -44,27 +48,30 @@ class WebApp(val app: TicTacToeApp) : HttpHandler {
         val x = request.parseX().onFailure { return it.toResponse(gameId) }
         val y = request.parseY().onFailure { return it.toResponse(gameId) }
 
-        app.makeMove(gameId, x, y).onFailure { return it.toResponse(gameId) }
-
-        return Response(SEE_OTHER).header("Location", "/game/$gameId")
+        return try {
+            app.makeMove(gameId, x, y)
+            Response(SEE_OTHER).header("Location", "/game/$gameId")
+        } catch (e: Exception) {
+            e.toResponse(gameId)
+        }
     }
 
     private fun Failure<ParsingError>.toResponse(gameId: GameId? = null) =
-        ErrorView("Invalid or missing ${reason.message}", gameId?.value).toResponse()
+        ErrorView("Invalid or missing ${reason.message}", gameId?.value).toResponse(htmlRenderer)
 
-    @JvmName("gameErrorResponse")
-    private fun Failure<GameError>.toResponse(gameId: GameId? = null) =
+    private fun Exception.toResponse(gameId: GameId? = null) =
         ErrorView(
-            message = when (val it = reason) {
+            message = when (val it = this) {
                 is MoveAfterGameOver -> "You can't move after the game is over"
                 is OutOfRangeMove -> "The move was out of range x=${it.x}, y=${it.y}"
                 is DuplicateMove -> "You can't move twice x=${it.x}, y=${it.y}"
                 is GameNotFound -> "Game not found"
+                else -> "Something went wrong 😭"
             },
             gameId = gameId?.value
-        ).toResponse()
+        ).toResponse(htmlRenderer)
 
-    private fun ViewModel.toResponse() =
+    private fun ViewModel.toResponse(htmlRenderer: TemplateRenderer) =
         Response(OK).html(htmlRenderer(this))
 
     private fun Request.parseX() =
