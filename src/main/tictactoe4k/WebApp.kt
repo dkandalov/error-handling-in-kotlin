@@ -13,7 +13,7 @@ import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 
-class WebApp(val gameStore: GameStore = GameStore()) : HttpHandler {
+class WebApp(val gameStore: GameStore) : HttpHandler {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
     private val httpHandler =
         routes(
