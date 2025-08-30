@@ -76,9 +76,6 @@ val playerOWinningMoves = listOf(
     Pair(1, 0), Pair(2, 2)
 )
 
-fun Game.with(moves: List<Pair<Int, Int>>) =
-    moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }
-
 val gameEndsInDrawMoves = listOf(
     Pair(1, 1), Pair(0, 0),
     Pair(0, 1), Pair(0, 2),
@@ -86,3 +83,6 @@ val gameEndsInDrawMoves = listOf(
     Pair(2, 0), Pair(2, 1),
     Pair(2, 2)
 )
+
+fun Game.with(moves: List<Pair<Int, Int>>) =
+    moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }
