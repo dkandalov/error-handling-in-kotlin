@@ -55,12 +55,12 @@ class WebAppTests {
     }
 
     @Test fun `game ends in a draw`(approver: Approver) {
-        gameStore.update(GameId(id), Game().makeMoves(gameEndsInDrawMoves))
+        gameStore.makeMoves(GameId(id), gameEndsInDrawMoves)
         approver.assertApproved(webApp(Request(GET, "/game/$id")).expectOK())
     }
 
     @Test fun `can't make moves after game is over`(approver: Approver) {
-        gameStore.update(GameId(id), Game().makeMoves(playerXWinningMoves))
+        gameStore.makeMoves(GameId(id), playerXWinningMoves)
         approver.assertApproved(webApp(Request(GET, "/game/$id/move?x=1&y=1")).expectOK())
     }
 
