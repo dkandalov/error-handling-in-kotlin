@@ -67,7 +67,6 @@ class H2GameStore(
     override fun update(id: GameId, game: Game) {
         ensureGameExists(id)
         useConnection { connection ->
-            connection.autoCommit = false
             try {
                 connection.prepareStatement("delete from moves where game_id = ?").use { ps ->
                     ps.setString(1, id.value)
@@ -88,10 +87,7 @@ class H2GameStore(
                 }
                 connection.commit()
             } catch (e: Exception) {
-                connection.rollback()
                 throw e
-            } finally {
-                connection.autoCommit = true
             }
         }
     }
@@ -99,7 +95,6 @@ class H2GameStore(
     override fun add(game: Game): GameId {
         val id = generateId()
         useConnection { connection ->
-            connection.autoCommit = false
             try {
                 connection.prepareStatement("insert into games(id) values (?)").use { ps ->
                     ps.setString(1, id.value)
@@ -122,10 +117,7 @@ class H2GameStore(
                 }
                 connection.commit()
             } catch (e: Exception) {
-                connection.rollback()
                 throw e
-            } finally {
-                connection.autoCommit = true
             }
         }
         return id
