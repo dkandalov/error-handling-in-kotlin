@@ -17,16 +17,9 @@ class UserCookieTests {
         val response = webApp(Request(GET, "/foo"))
         expectThat(response.cookies()).isEqualTo(listOf(Cookie("userid", "1", path = "/", httpOnly = true)))
     }
+    
     @Test fun `does not overwrite existing userid cookie`() {
         val response = webApp(Request(GET, "/").cookie("userid", "123"))
         expectThat(response.cookies()).isEqualTo(emptyList())
-
-//        val setCookie = first.headers.firstNotNullOf { (name, value) -> if (name.equals("Set-Cookie", ignoreCase = true) && value?.startsWith("userid=") == true) value else null }
-//        val value = setCookie.substringAfter("userid=").substringBefore(';')
-//
-//        val response = webApp(Request(GET, "/").header("Cookie", "userid=$value"))
-//        // Should not set a new cookie when one is already present
-//        val cookies = response.headers.mapNotNull { (name, v) -> if (name.equals("Set-Cookie", ignoreCase = true) && v?.startsWith("userid=") == true) v else null }
-//        expectThat(cookies.size).isEqualTo(0)
     }
 }
