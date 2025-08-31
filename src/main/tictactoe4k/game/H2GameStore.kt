@@ -89,7 +89,7 @@ class H2GameStore(
     }
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) {
-        val updatedGame = findGame(id).makeMove(x, y)
+        val updatedGame = findGame(id).makeMove(Move(x, y, Player.X))
         val newMove = updatedGame.moves.last()
         useConnection { connection ->
             val nextSeq = connection.prepareStatement("select max(seq) from moves where game_id = ?").use { ps ->

@@ -4,8 +4,6 @@ import tictactoe4k.game.Player.O
 import tictactoe4k.game.Player.X
 
 data class Game(val moves: List<Move> = emptyList()) {
-    fun makeMove(x: Int, y: Int): Game = makeMove(Move(x, y, Player.X))
-
     fun makeMove(move: Move): Game {
         if (isOver) throw MoveAfterGameOver()
         if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move.x, move.y)

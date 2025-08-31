@@ -26,7 +26,6 @@ abstract class GameStoreTests(private val store: GameStore) {
         expectThat(id1).isNotEqualTo(id2)
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `games are updated independently`() {
         val id1 = store.newGame()
         val id2 = store.newGame()
@@ -43,7 +42,6 @@ abstract class GameStoreTests(private val store: GameStore) {
         assertFailsWith<GameNotFound> { store.findGame(GameId("non-existent-id")) }
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make move in non-existent game`() {
         assertFailsWith<GameNotFound> { store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user")) }
     }
