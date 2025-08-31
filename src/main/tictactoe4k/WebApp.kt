@@ -91,8 +91,8 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
 
 private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
-        val hasUserId = request.cookie("userid") != null
         val response = next(request)
-        if (hasUserId) response else response.cookie(Cookie("userid", gameStore.newUserId(), path = "/", httpOnly = true))
+        if (request.cookie("userid") != null) response
+        else response.cookie(Cookie("userid", gameStore.newUserId(), path = "/", httpOnly = true))
     }
 }
