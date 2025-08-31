@@ -11,6 +11,9 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.lens.html
 import org.http4k.routing.*
+import org.http4k.routing.sse.bind
+import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
@@ -18,10 +21,11 @@ import tictactoe4k.game.Game
 import tictactoe4k.game.GameId
 import tictactoe4k.game.GameStore
 import tictactoe4k.game.UserId
+import java.util.concurrent.ConcurrentHashMap
 
-class WebApp(val gameStore: GameStore) : HttpHandler {
+class WebApp(val gameStore: GameStore) {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
-    private val httpHandler =
+    val httpHandler =
         routes(
             "/" bind GET to { newGame() },
             "/game/{gameId}" bind GET to ::findGame,
@@ -29,8 +33,8 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
             "/static" bind static(ResourceLoader.Classpath("public"))
         ).withFilter(HandleUnexpectedExceptions(htmlRenderer)).withFilter(UserIdCookieFilter(gameStore))
 
-    override fun invoke(request: Request) =
-        httpHandler(request)
+    private val subscribersByGame = ConcurrentHashMap<GameId, MutableSet<Sse>>()
+    val sseHandler = sse("/game/events" bind sse { subscribeToGameEvents(it) })
 
     private fun newGame(): Response {
         val gameId = gameStore.newGame()
@@ -50,7 +54,34 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
         val userId = UserId(request.cookie("userid")!!.value)
 
         gameStore.makeMove(gameId, x, y, userId)
+        broadcastUpdate(gameId)
+
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
+    }
+
+    private fun subscribeToGameEvents(sse: Sse) {
+        val gameId = sse.connectRequest.query("gameId")?.let(::GameId)
+            ?: run {
+                sse.send(SseMessage.Event("error", "Invalid game id"))
+                sse.close()
+                return
+            }
+
+        val subscribers = subscribersByGame.getOrPut(gameId) { ConcurrentHashMap.newKeySet() }
+        subscribers.add(sse)
+        sse.onClose { subscribers.remove(sse) }
+        sse.send(SseMessage.Event("connected", gameId.value))
+    }
+
+    private fun broadcastUpdate(gameId: GameId) {
+        subscribersByGame[gameId]?.forEach { client ->
+            try {
+                client.send(SseMessage.Event("update", "reload"))
+            } catch (_: Exception) {
+                // Best effort: if sending fails, drop the client
+                subscribersByGame[gameId]?.remove(client)
+            }
+        }
     }
 
     private fun Request.parseGameId() =

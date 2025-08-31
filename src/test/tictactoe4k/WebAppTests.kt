@@ -4,7 +4,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -22,9 +21,7 @@ class WebAppTests {
         gamesById = mutableMapOf(id to Game()),
         generateId = sequentialIds()
     )
-    private val webApp = ClientFilters.FollowRedirects().then(
-        WebApp(gameStore)
-    )
+    private val webApp = ClientFilters.FollowRedirects().then(WebApp(gameStore).httpHandler)
 
     @Test fun `create new game`(approver: Approver) {
         val response = webApp(Request(GET, "/")).expectOK()

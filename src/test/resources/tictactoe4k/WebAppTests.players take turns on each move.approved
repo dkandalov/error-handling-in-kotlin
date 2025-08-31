@@ -19,4 +19,10 @@
         
     </p>
 </div>
+<script>
+    (function() {
+        const es = new EventSource("/game/events?gameId=some-game-id");
+        es.addEventListener("update", function() { location.reload(); });
+    })();
+</script>
 </body>

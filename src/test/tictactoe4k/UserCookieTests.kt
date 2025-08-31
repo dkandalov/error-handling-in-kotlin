@@ -11,7 +11,7 @@ import strikt.assertions.isEqualTo
 import tictactoe4k.game.InMemoryGameStore
 
 class UserCookieTests {
-    private val webApp = WebApp(InMemoryGameStore(generateId = sequentialIds()))
+    private val webApp = WebApp(InMemoryGameStore(generateId = sequentialIds())).httpHandler
 
     @Test fun `sets userid cookie when absent`() {
         val response = webApp(Request(GET, "/foo"))

@@ -24,4 +24,10 @@
     <a href="/">Start new game</a>?
 {{~/if~}}
 </div>
+<script>
+    (function() {
+        const es = new EventSource("/game/events?gameId={{gameId}}");
+        es.addEventListener("update", function() { location.reload(); });
+    })();
+</script>
 </body>
