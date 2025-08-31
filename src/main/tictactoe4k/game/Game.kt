@@ -8,7 +8,7 @@ data class Game(val moves: List<Move> = emptyList()) {
         if (isOver) throw MoveAfterGameOver()
         if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move.x, move.y)
         if (moves.any { it.x == move.x && it.y == move.y }) throw DuplicateMove(move.x, move.y)
-        if (move.player != nextPlayer) throw GameException("It's not ${move.player}'s turn")
+        if (move.player != nextPlayer) throw WrongPlayerMove(move.player)
 
         return Game(moves + move)
     }
@@ -42,3 +42,4 @@ open class GameException(message: String? = null) : Exception(message)
 class MoveAfterGameOver : GameException("You can't move after the game is over")
 data class OutOfRangeMove(val x: Int, val y: Int) : GameException("Out of range: x=$x, y=$y")
 data class DuplicateMove(val x: Int, val y: Int) : GameException("Duplicate move at x=$x, y=$y")
+data class WrongPlayerMove(val player: Player) : GameException("It's not $player's turn")

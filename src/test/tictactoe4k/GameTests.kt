@@ -67,6 +67,12 @@ class GameTests {
         assertFailsWith<MoveAfterGameOver> { Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, Player.X)) }
     }
 
+    @Suppress("RETURN_VALUE_NOT_USED")
+    @Test fun `can't make moves with wrong player`() {
+        assertFailsWith<WrongPlayerMove> { Game().makeMove(Move(0, 0, Player.O)) }
+        assertFailsWith<WrongPlayerMove> { Game().makeMove(Move(0, 0, Player.X)).makeMove(Move(0, 1, Player.X)) }
+    }
+
     private fun Game.makeMoves(moves: List<Move>) =
         moves.fold(this, Game::makeMove)
 }
