@@ -5,6 +5,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotEqualTo
 import tictactoe4k.game.*
+import tictactoe4k.game.Player.O
 import tictactoe4k.game.Player.X
 import kotlin.test.assertFailsWith
 
@@ -23,6 +24,20 @@ abstract class GameStoreTests(private val store: GameStore) {
         val id1 = store.newGame()
         val id2 = store.newGame()
         expectThat(id1).isNotEqualTo(id2)
+    }
+
+    @Test fun `users take turns in the game`() {
+        val id = store.newGame()
+
+        store.makeMove(id, 0, 0, UserId("user-1"))
+        store.makeMove(id, 1, 1, UserId("user-2"))
+        store.makeMove(id, 2, 2, UserId("user-1"))
+
+        expectThat(store.findGame(id)).isEqualTo(Game(listOf(
+            Move(0, 0, X),
+            Move(1, 1, O),
+            Move(2, 2, X)
+        )))
     }
 
     @Test fun `games are updated independently`() {
