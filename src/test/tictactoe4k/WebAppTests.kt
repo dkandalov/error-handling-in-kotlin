@@ -92,7 +92,7 @@ class WebAppTests {
         moves.forEach { (x, y) -> makeMove(id, x, y) }
 }
 
-fun sequentialIds(): () -> GameId {
+fun sequentialIds(): () -> String {
     val id = AtomicInteger(0)
-    return { GameId(id.incrementAndGet().toString()) }
+    return { id.incrementAndGet().toString() }
 }

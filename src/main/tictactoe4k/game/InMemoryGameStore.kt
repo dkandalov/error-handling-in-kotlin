@@ -5,10 +5,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryGameStore(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
-    private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
+    private val generateId: () -> String = { UUID.randomUUID().toString() },
 ) : GameStore {
     override fun newGame(): GameId {
-        val id = generateId()
+        val id = GameId(generateId())
         gamesById[id] = Game()
         return id
     }
@@ -22,6 +22,6 @@ class InMemoryGameStore(
     }
 
     override fun newUserId(): String {
-        return generateId().value
+        return generateId()
     }
 }
