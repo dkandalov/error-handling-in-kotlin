@@ -7,6 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.lens.html
 import org.http4k.routing.*
 import org.http4k.template.HandlebarsTemplates
@@ -24,7 +26,7 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
             "/game/{gameId}" bind GET to ::findGame,
             "/game/{gameId}/move" bind GET to ::makeMove,
             "/static" bind static(ResourceLoader.Classpath("public"))
-        ).withFilter(HandleUnexpectedExceptions(htmlRenderer))
+        ).withFilter(HandleUnexpectedExceptions(htmlRenderer)).withFilter(UserIdCookieFilter(gameStore))
 
     override fun invoke(request: Request) =
         httpHandler(request)
@@ -84,5 +86,13 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
         } catch (e: Exception) {
             Response(OK).html(htmlRenderer(ErrorView(message = "Something went wrong 😭")))
         }
+    }
+}
+
+private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
+    override fun invoke(next: HttpHandler): HttpHandler = { request ->
+        val hasUserId = request.cookie("userid") != null
+        val response = next(request)
+        if (hasUserId) response else response.cookie(Cookie("userid", gameStore.newUserId(), path = "/", httpOnly = true))
     }
 }

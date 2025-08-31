@@ -20,4 +20,8 @@ class InMemoryGameStore(
         val updatedGame = findGame(id).makeMove(x, y)
         gamesById[id] = updatedGame
     }
+
+    override fun newUserId(): String {
+        return generateId().value
+    }
 }

@@ -23,7 +23,7 @@ class WebAppTests {
     private val id = GameId("some-game-id")
     private val gameStore = InMemoryGameStore(
         gamesById = mutableMapOf(id to Game()),
-        generateId = generateSequentialIds()
+        generateId = sequentialIds()
     )
     private val webApp = ClientFilters.FollowRedirects().then(
         WebApp(gameStore)
@@ -88,11 +88,11 @@ class WebAppTests {
         return this
     }
 
-    private fun generateSequentialIds(): () -> GameId {
-        val id = AtomicInteger()
-        return { GameId(id.incrementAndGet().toString()) }
-    }
-
     private fun GameStore.makeMoves(id: GameId, moves: List<Pair<Int, Int>>) =
         moves.forEach { (x, y) -> makeMove(id, x, y) }
+}
+
+fun sequentialIds(): () -> GameId {
+    val id = AtomicInteger(0)
+    return { GameId(id.incrementAndGet().toString()) }
 }

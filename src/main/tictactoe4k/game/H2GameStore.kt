@@ -110,6 +110,10 @@ class H2GameStore(
         }
     }
 
+    override fun newUserId(): String {
+        return generateId().value
+    }
+
     private fun ensureGameExists(id: GameId) {
         val exists = useConnection { connection ->
             connection.prepareStatement("select 1 from games where id = ?").use { ps ->

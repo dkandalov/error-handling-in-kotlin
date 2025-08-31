@@ -4,6 +4,7 @@ interface GameStore {
     fun newGame(): GameId
     fun findGame(id: GameId): Game
     fun makeMove(id: GameId, x: Int, y: Int)
+    fun newUserId(): String
 }
 
 @JvmInline
@@ -12,4 +13,3 @@ value class GameId(val value: String) {
 }
 
 data class GameNotFound(val id: GameId) : GameException("Game not found: $id")
-
