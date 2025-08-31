@@ -6,7 +6,7 @@ import java.util.*
 
 class H2GameStore(
     private val jdbcUrl: String,
-    private val generateId: () -> GameId = { GameId(UUID.randomUUID().toString()) },
+    private val generateId: () -> String = { UUID.randomUUID().toString() },
 ) : GameStore {
     fun init() = apply {
         useConnection { connection ->
@@ -40,7 +40,7 @@ class H2GameStore(
         val game = Game()
         useConnection { connection ->
             connection.prepareStatement("insert into games(id) values (?)").use { ps ->
-                ps.setString(1, id.value)
+                ps.setString(1, id)
                 ps.executeUpdate()
             }
             if (game.moves.isNotEmpty()) {
@@ -48,7 +48,7 @@ class H2GameStore(
                     "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
                 ).use { ps ->
                     game.moves.forEachIndexed { index, move ->
-                        ps.setString(1, id.value)
+                        ps.setString(1, id)
                         ps.setInt(2, index)
                         ps.setInt(3, move.x)
                         ps.setInt(4, move.y)
@@ -60,7 +60,7 @@ class H2GameStore(
             }
             connection.commit()
         }
-        return id
+        return GameId(id)
     }
 
     override fun findGame(id: GameId): Game {
@@ -111,7 +111,7 @@ class H2GameStore(
     }
 
     override fun newUserId(): String {
-        return generateId().value
+        return generateId()
     }
 
     private fun ensureGameExists(id: GameId) {
