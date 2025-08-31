@@ -15,12 +15,11 @@ class H2GameStoreTests: GameStoreTests(H2GameStore("jdbc:h2:mem:tictactoe_test;D
 abstract class GameStoreTests(private val store: GameStore) {
 
     @Test fun `game can be looked up by id`() {
-        val game = Game()
         val id = store.newGame()
-        expectThat(store.findGame(id)).isEqualTo(game)
+        expectThat(store.findGame(id)).isEqualTo(Game())
     }
 
-    @Test fun `added games have different ids`() {
+    @Test fun `games have different ids`() {
         val id1 = store.newGame()
         val id2 = store.newGame()
         expectThat(id1).isNotEqualTo(id2)
