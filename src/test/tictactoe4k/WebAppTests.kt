@@ -85,8 +85,12 @@ class WebAppTests {
         return this
     }
 
-    private fun GameStore.makeMoves(id: GameId, moves: List<Move>) =
-        moves.forEach { move -> makeMove(id, move.x, move.y) }
+    private fun GameStore.makeMoves(id: GameId, moves: List<Move>) {
+        val alternateUsers = generateSequence { sequenceOf(UserId("user-1"), UserId("user-2")) }.flatten()
+        moves.asSequence().zip(alternateUsers).forEach { (move, user) ->
+            makeMove(id, move.x, move.y, user)
+        }
+    }
 }
 
 fun sequentialIds(): () -> String {

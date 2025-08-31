@@ -10,7 +10,7 @@ data class Game(val moves: List<Move> = emptyList()) {
         if (isOver) throw MoveAfterGameOver()
         if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move.x, move.y)
         if (moves.any { it.x == move.x && it.y == move.y }) throw DuplicateMove(move.x, move.y)
-        if (move.player != nextPlayer) throw GameException()
+        if (move.player != nextPlayer) throw GameException("It's not ${move.player}'s turn")
 
         return Game(moves + move)
     }

@@ -31,8 +31,8 @@ abstract class GameStoreTests(private val store: GameStore) {
         val id1 = store.newGame()
         val id2 = store.newGame()
 
-        store.makeMove(id1, 0, 0)
-        store.makeMove(id2, 1, 1)
+        store.makeMove(id1, 0, 0, UserId("some-user"))
+        store.makeMove(id2, 1, 1, UserId("some-user"))
 
         expectThat(store.findGame(id1)).isEqualTo(Game(listOf(Move(0, 0, X))))
         expectThat(store.findGame(id2)).isEqualTo(Game(listOf(Move(1, 1, X))))
@@ -45,6 +45,6 @@ abstract class GameStoreTests(private val store: GameStore) {
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make move in non-existent game`() {
-        assertFailsWith<GameNotFound> { store.makeMove(GameId("non-existent-id"), 0, 0) }
+        assertFailsWith<GameNotFound> { store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user")) }
     }
 }

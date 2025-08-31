@@ -17,6 +17,7 @@ import org.http4k.template.ViewModel
 import tictactoe4k.game.Game
 import tictactoe4k.game.GameId
 import tictactoe4k.game.GameStore
+import tictactoe4k.game.UserId
 
 class WebApp(val gameStore: GameStore) : HttpHandler {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
@@ -46,8 +47,9 @@ class WebApp(val gameStore: GameStore) : HttpHandler {
         val gameId = request.parseGameId()
         val x = request.query("x")!!.toInt()
         val y = request.query("y")!!.toInt()
+        val userId = UserId(request.cookie("userid")!!.value)
 
-        gameStore.makeMove(gameId, x, y)
+        gameStore.makeMove(gameId, x, y, userId)
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
@@ -91,8 +93,12 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
 
 private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
-        val response = next(request)
-        if (request.cookie("userid") != null) response
-        else response.cookie(Cookie("userid", gameStore.newUserId().value, path = "/", httpOnly = true))
+        val userId = request.cookie("userid")?.let { UserId(it.value) }
+        if (userId != null) next(request)
+        else {
+            val newUserId = gameStore.newUserId()
+            val response = next(request.cookie("userid", newUserId.value))
+            response.cookie(Cookie("userid", newUserId.value, path = "/", httpOnly = true))
+        }
     }
 }

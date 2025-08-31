@@ -88,7 +88,7 @@ class H2GameStore(
         return Game(moves)
     }
 
-    override fun makeMove(id: GameId, x: Int, y: Int) {
+    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) {
         val updatedGame = findGame(id).makeMove(x, y)
         val newMove = updatedGame.moves.last()
         useConnection { connection ->
