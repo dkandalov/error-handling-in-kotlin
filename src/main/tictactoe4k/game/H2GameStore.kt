@@ -26,7 +26,19 @@ class H2GameStore(
                         x int not null,
                         y int not null,
                         player varchar(1) not null,
+                        user_id varchar(100) not null,
                         primary key (game_id, seq),
+                        foreign key (game_id) references games(id) on delete cascade
+                    )
+                    """.trimIndent()
+                )
+                st.executeUpdate(
+                    """
+                    create table if not exists game_users (
+                        game_id varchar(100) not null,
+                        user_id varchar(100) not null,
+                        player varchar(1) not null,
+                        primary key (game_id, user_id),
                         foreign key (game_id) references games(id) on delete cascade
                     )
                     """.trimIndent()
@@ -89,21 +101,63 @@ class H2GameStore(
     }
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) {
-        val updatedGame = findGame(id).makeMove(Move(x, y, Player.X))
-        val newMove = updatedGame.moves.last()
+        ensureGameExists(id)
         useConnection { connection ->
-            val nextSeq = connection.prepareStatement("select max(seq) from moves where game_id = ?").use { ps ->
+            val existingPlayer = connection.prepareStatement(
+                "select player from game_users where game_id = ? and user_id = ?"
+            ).use { ps ->
                 ps.setString(1, id.value)
-                ps.executeQuery().use { rs -> if (rs.next()) rs.getInt(1).let { if (rs.wasNull()) -1 else it } else -1 }
-            } + 1
+                ps.setString(2, userId.value)
+                ps.executeQuery().use { rs -> if (rs.next()) rs.getString(1) else null }
+            }
+            val player =
+                if (existingPlayer != null) {
+                    when (existingPlayer) {
+                        "X" -> Player.X
+                        "O" -> Player.O
+                        else -> error("Unknown player")
+                    }
+                } else {
+                    val count = connection.createStatement().use { st ->
+                        st.executeQuery("select count(*) from game_users where game_id = '${id.value}'").use { rs ->
+                            if (rs.next()) rs.getInt(1) else 0
+                        }
+                    }
+                    val assignedPlayer = when (count) {
+                        0 -> Player.X
+                        1 -> Player.O
+                        else -> throw GameException("Cannot make the move. There are already two players.")
+                    }
+                    connection.prepareStatement(
+                        "insert into game_users(game_id, user_id, player) values (?, ?, ?)"
+                    ).use { ps ->
+                        ps.setString(1, id.value)
+                        ps.setString(2, userId.value)
+                        ps.setString(3, assignedPlayer.name)
+                        ps.executeUpdate()
+                    }
+                    assignedPlayer
+                }
+
+            val nextSeq = connection.prepareStatement("select max(seq) from moves where game_id = ?")
+                .use { ps ->
+                    ps.setString(1, id.value)
+                    ps.executeQuery().use { rs -> if (rs.next()) rs.getInt(1).let { if (rs.wasNull()) -1 else it } else -1 }
+                } + 1
+
+            val move = Move(x, y, player)
+            val updatedGame = findGame(id).makeMove(move)
+            val newMove = updatedGame.moves.last()
+
             connection.prepareStatement(
-                "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
+                "insert into moves(game_id, seq, x, y, player, user_id) values (?, ?, ?, ?, ?, ?)"
             ).use { ps ->
                 ps.setString(1, id.value)
                 ps.setInt(2, nextSeq)
                 ps.setInt(3, newMove.x)
                 ps.setInt(4, newMove.y)
                 ps.setString(5, newMove.player.name)
+                ps.setString(6, userId.value)
                 ps.executeUpdate()
             }
             connection.commit()

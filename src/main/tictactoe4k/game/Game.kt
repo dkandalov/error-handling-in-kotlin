@@ -15,7 +15,7 @@ data class Game(val moves: List<Move> = emptyList()) {
 
     val winner: Player? = findWinner()
     val isOver = winner != null || moves.size == 9
-    val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
+    val nextPlayer = if (isOver) null else if (moves.lastOrNull()?.player == X) O else X
 
     private fun findWinner(): Player? =
         Player.entries.find { player ->
