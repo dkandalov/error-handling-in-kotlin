@@ -11,9 +11,9 @@ import kotlin.test.assertFailsWith
 class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
-            Game().makeMove(0, 1)
-                .makeMove(2, 0)
-                .makeMove(2, 1)
+            Game().makeMove(Move(0, 1, Player.X))
+                .makeMove(Move(2, 0, Player.O))
+                .makeMove(Move(2, 1, Player.X))
 
         expectThat(updatedGame.moves).isEqualTo(
             listOf(
@@ -46,43 +46,43 @@ class GameTests {
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make the same move twice`() {
         val game = Game()
-            .makeMove(0, 0)
-            .makeMove(1, 1)
+            .makeMove(Move(0, 0, Player.X))
+            .makeMove(Move(1, 1, Player.O))
 
-        assertFailsWith<DuplicateMove> { game.makeMove(0, 0) }
+        assertFailsWith<DuplicateMove> { game.makeMove(Move(0, 0, Player.X)) }
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves outside of the board`() {
-        assertFailsWith<OutOfRangeMove> { Game().makeMove(-1, 0) }
-        assertFailsWith<OutOfRangeMove> { Game().makeMove(0, 3) }
+        assertFailsWith<OutOfRangeMove> { Game().makeMove(Move(-1, 0, Player.X)) }
+        assertFailsWith<OutOfRangeMove> { Game().makeMove(Move(0, 3, Player.X)) }
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves when the game is over`() {
-        assertFailsWith<MoveAfterGameOver> { Game().makeMoves(playerXWinningMoves).makeMove(2, 2) }
+        assertFailsWith<MoveAfterGameOver> { Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, Player.X)) }
     }
 
-    private fun Game.makeMoves(moves: List<Pair<Int, Int>>) =
-        moves.fold(this) { game, (x, y) -> game.makeMove(x, y) }
+    private fun Game.makeMoves(moves: List<Move>) =
+        moves.fold(this, Game::makeMove)
 }
 
 val playerXWinningMoves = listOf(
-    Pair(0, 0), Pair(1, 0),
-    Pair(0, 1), Pair(1, 1),
-    Pair(0, 2)
+    Move(0, 0, Player.X), Move(1, 0, Player.O),
+    Move(0, 1, Player.X), Move(1, 1, Player.O),
+    Move(0, 2, Player.X)
 )
 
 val playerOWinningMoves = listOf(
-    Pair(0, 1), Pair(0, 0),
-    Pair(0, 2), Pair(1, 1),
-    Pair(1, 0), Pair(2, 2)
+    Move(0, 1, Player.X), Move(0, 0, Player.O),
+    Move(0, 2, Player.X), Move(1, 1, Player.O),
+    Move(1, 0, Player.X), Move(2, 2, Player.O)
 )
 
 val gameEndsInDrawMoves = listOf(
-    Pair(1, 1), Pair(0, 0),
-    Pair(0, 1), Pair(0, 2),
-    Pair(1, 0), Pair(1, 2),
-    Pair(2, 0), Pair(2, 1),
-    Pair(2, 2)
+    Move(1, 1, Player.X), Move(0, 0, Player.O),
+    Move(0, 1, Player.X), Move(0, 2, Player.O),
+    Move(1, 0, Player.X), Move(1, 2, Player.O),
+    Move(2, 0, Player.X), Move(2, 1, Player.O),
+    Move(2, 2, Player.X)
 )

@@ -4,17 +4,20 @@ import tictactoe4k.game.Player.O
 import tictactoe4k.game.Player.X
 
 data class Game(val moves: List<Move> = emptyList()) {
-    fun makeMove(x: Int, y: Int): Game {
-        if (isOver) throw MoveAfterGameOver()
-        if (x !in 0..2 || y !in 0..2) throw OutOfRangeMove(x, y)
-        if (moves.any { it.x == x && it.y == y }) throw DuplicateMove(x, y)
+    fun makeMove(x: Int, y: Int): Game = makeMove(Move(x, y, Player.X))
 
-        val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
-        return Game(moves + Move(x, y, nextPlayer))
+    fun makeMove(move: Move): Game {
+        if (isOver) throw MoveAfterGameOver()
+        if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move.x, move.y)
+        if (moves.any { it.x == move.x && it.y == move.y }) throw DuplicateMove(move.x, move.y)
+        if (move.player != nextPlayer) throw GameException()
+
+        return Game(moves + move)
     }
 
     val winner: Player? = findWinner()
     val isOver = winner != null || moves.size == 9
+    val nextPlayer = if (moves.lastOrNull()?.player == X) O else X
 
     private fun findWinner(): Player? =
         Player.entries.find { player ->

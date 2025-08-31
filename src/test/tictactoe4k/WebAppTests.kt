@@ -12,10 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
-import tictactoe4k.game.Game
-import tictactoe4k.game.GameId
-import tictactoe4k.game.GameStore
-import tictactoe4k.game.InMemoryGameStore
+import tictactoe4k.game.*
 import java.util.concurrent.atomic.AtomicInteger
 
 @ExtendWith(ApprovalTest::class)
@@ -88,8 +85,8 @@ class WebAppTests {
         return this
     }
 
-    private fun GameStore.makeMoves(id: GameId, moves: List<Pair<Int, Int>>) =
-        moves.forEach { (x, y) -> makeMove(id, x, y) }
+    private fun GameStore.makeMoves(id: GameId, moves: List<Move>) =
+        moves.forEach { move -> makeMove(id, move.x, move.y) }
 }
 
 fun sequentialIds(): () -> String {
