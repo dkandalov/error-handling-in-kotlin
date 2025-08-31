@@ -93,6 +93,6 @@ private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
         val response = next(request)
         if (request.cookie("userid") != null) response
-        else response.cookie(Cookie("userid", gameStore.newUserId(), path = "/", httpOnly = true))
+        else response.cookie(Cookie("userid", gameStore.newUserId().value, path = "/", httpOnly = true))
     }
 }

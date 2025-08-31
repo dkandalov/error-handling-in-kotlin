@@ -110,9 +110,8 @@ class H2GameStore(
         }
     }
 
-    override fun newUserId(): String {
-        return generateId()
-    }
+    override fun newUserId() =
+        UserId(generateId())
 
     private fun ensureGameExists(id: GameId) {
         val exists = useConnection { connection ->

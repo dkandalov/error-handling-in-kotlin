@@ -21,7 +21,6 @@ class InMemoryGameStore(
         gamesById[id] = updatedGame
     }
 
-    override fun newUserId(): String {
-        return generateId()
-    }
+    override fun newUserId() =
+        UserId(generateId())
 }

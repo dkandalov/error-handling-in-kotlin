@@ -4,11 +4,16 @@ interface GameStore {
     fun newGame(): GameId
     fun findGame(id: GameId): Game
     fun makeMove(id: GameId, x: Int, y: Int)
-    fun newUserId(): String
+    fun newUserId(): UserId
 }
 
 @JvmInline
 value class GameId(val value: String) {
+    override fun toString() = value
+}
+
+@JvmInline
+value class UserId(val value: String) {
     override fun toString() = value
 }
 
