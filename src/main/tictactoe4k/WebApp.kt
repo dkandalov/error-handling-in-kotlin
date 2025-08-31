@@ -59,14 +59,11 @@ class WebApp(val gameStore: GameStore) {
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
-    private fun subscribeToGameEvents(sse: Sse) {
-        val gameId = sse.connectRequest.query("gameId")?.let(::GameId)
-            ?: run {
-                sse.send(SseMessage.Event("error", "Invalid game id"))
-                sse.close()
-                return
-            }
+    private fun Request.parseGameId() =
+        path("gameId")!!.let(::GameId)
 
+    private fun subscribeToGameEvents(sse: Sse) {
+        val gameId = sse.connectRequest.parseGameId()
         val subscribers = subscribersByGame.getOrPut(gameId) { ConcurrentHashMap.newKeySet() }
         subscribers.add(sse)
         sse.onClose { subscribers.remove(sse) }
@@ -78,14 +75,10 @@ class WebApp(val gameStore: GameStore) {
             try {
                 client.send(SseMessage.Event("update", "reload"))
             } catch (_: Exception) {
-                // Best effort: if sending fails, drop the client
                 subscribersByGame[gameId]?.remove(client)
             }
         }
     }
-
-    private fun Request.parseGameId() =
-        path("gameId")!!.let(::GameId)
 }
 
 private class GameView(
