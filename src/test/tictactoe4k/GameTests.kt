@@ -23,24 +23,28 @@ class GameTests {
             )
         )
         expectThat(updatedGame.isOver).isFalse()
+        expectThat(updatedGame.nextPlayer).isEqualTo(Player.O)
     }
 
     @Test fun `player X wins`() {
         val game = Game().makeMoves(playerXWinningMoves)
-        expectThat(game.winner).isEqualTo(Player.X)
         expectThat(game.isOver).isTrue()
+        expectThat(game.winner).isEqualTo(Player.X)
+        expectThat(game.nextPlayer).isEqualTo(null)
     }
 
     @Test fun `player O wins`() {
         val game = Game().makeMoves(playerOWinningMoves)
-        expectThat(game.winner).isEqualTo(Player.O)
         expectThat(game.isOver).isTrue()
+        expectThat(game.winner).isEqualTo(Player.O)
+        expectThat(game.nextPlayer).isEqualTo(null)
     }
 
     @Test fun `game ends in a draw`() {
         val game = Game().makeMoves(gameEndsInDrawMoves)
-        expectThat(game.winner).isEqualTo(null)
         expectThat(game.isOver).isTrue()
+        expectThat(game.winner).isEqualTo(null)
+        expectThat(game.nextPlayer).isEqualTo(null)
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
