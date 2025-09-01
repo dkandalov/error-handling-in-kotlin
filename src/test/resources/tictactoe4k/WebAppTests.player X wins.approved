@@ -23,6 +23,6 @@ X wins!! 🥳
     <br/>
     <a href="/">Start new game</a>?</div>
 <script>
-    onPageLoad();
+    onPageLoad('some-game-id');
 </script>
 </body>

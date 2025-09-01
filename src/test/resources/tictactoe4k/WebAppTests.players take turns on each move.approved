@@ -21,6 +21,6 @@
     </p>
 </div>
 <script>
-    onPageLoad();
+    onPageLoad('some-game-id');
 </script>
 </body>

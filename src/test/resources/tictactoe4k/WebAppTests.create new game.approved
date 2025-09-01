@@ -21,6 +21,6 @@
     </p>
 </div>
 <script>
-    onPageLoad();
+    onPageLoad('2');
 </script>
 </body>
