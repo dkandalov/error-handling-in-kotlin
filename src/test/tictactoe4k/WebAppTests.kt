@@ -64,6 +64,12 @@ class WebAppTests {
         approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userid", "user-O")).expectOK())
     }
 
+    @Test fun `third player joining the game can't make moves`(approver: Approver) {
+        http(Request(GET, "/game/$gameId/move?x=0&y=0")).expectOK()
+        http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK()
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=2&y=2")).expectOK())
+    }
+
     @Test fun `duplicate move`(approver: Approver) {
         http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK()
         approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK())
