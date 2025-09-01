@@ -4,6 +4,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.cookie
 import org.http4k.filter.ClientFilters.FollowRedirects
 import org.http4k.sse.SseMessage
 import org.http4k.testing.ApprovalTest
@@ -60,7 +61,7 @@ class WebAppTests {
 
     @Test fun `can't make moves after game is over`(approver: Approver) {
         gameStore.makeMoves(gameId, playerXWinningMoves)
-        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK())
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userid", "user-O")).expectOK())
     }
 
     @Test fun `duplicate move`(approver: Approver) {
@@ -101,7 +102,7 @@ class WebAppTests {
     }
 
     private fun GameStore.makeMoves(id: GameId, moves: List<Move>) {
-        val alternateUsers = generateSequence { sequenceOf(UserId("user-1"), UserId("user-2")) }.flatten()
+        val alternateUsers = generateSequence { sequenceOf(UserId("user-X"), UserId("user-O")) }.flatten()
         moves.asSequence().zip(alternateUsers).forEach { (move, user) ->
             makeMove(id, move.x, move.y, user)
         }

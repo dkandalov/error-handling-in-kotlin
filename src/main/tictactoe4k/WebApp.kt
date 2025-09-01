@@ -110,6 +110,7 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
         try {
             handler(request)
         } catch (e: Exception) {
+            e.printStackTrace()
             Response(OK).html(htmlRenderer(ErrorView(message = "Something went wrong 😭")))
         }
     }
