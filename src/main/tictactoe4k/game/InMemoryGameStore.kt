@@ -20,14 +20,13 @@ class InMemoryGameStore(
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) {
         val players = playersByGame.getOrPut(id) { ConcurrentHashMap() }
-        val player = players[userId]
-            ?: when (players.size) {
+        val player = players.getOrPut(userId) {
+            when (players.size) {
                 0 -> Player.X
                 1 -> Player.O
                 else -> throw GameException("Cannot make the move. There are already two players.")
             }
-        players[userId] = player
-
+        }
         val updatedGame = findGame(id).makeMove(Move(x, y, player))
         gamesById[id] = updatedGame
     }
