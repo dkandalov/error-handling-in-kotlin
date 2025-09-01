@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @ExtendWith(ApprovalTest::class)
 class WebAppTests {
-    private val id = GameId("some-game-id")
+    private val gameId = GameId("some-game-id")
     private val gameStore = InMemoryGameStore(
-        gamesById = mutableMapOf(id to Game()),
+        gamesById = mutableMapOf(gameId to Game()),
         generateId = sequentialIds()
     )
     val webApp = WebApp(gameStore)
@@ -33,7 +33,7 @@ class WebAppTests {
     }
 
     @Test fun `get game state`(approver: Approver) {
-        val response = http(Request(GET, "/game/$id")).expectOK()
+        val response = http(Request(GET, "/game/$gameId")).expectOK()
         approver.assertApproved(response)
     }
 
@@ -43,53 +43,53 @@ class WebAppTests {
     }
 
     @Test fun `players take turns on each move`(approver: Approver) {
-        http(Request(GET, "/game/$id/move?x=0&y=1")).expectOK()
-        val response = http(Request(GET, "/game/$id/move?x=2&y=0")).expectOK()
+        http(Request(GET, "/game/$gameId/move?x=0&y=1")).expectOK()
+        val response = http(Request(GET, "/game/$gameId/move?x=2&y=0")).expectOK()
         approver.assertApproved(response)
     }
 
     @Test fun `player X wins`(approver: Approver) {
-        gameStore.makeMoves(id, playerXWinningMoves)
-        approver.assertApproved(http(Request(GET, "/game/$id")).expectOK())
+        gameStore.makeMoves(gameId, playerXWinningMoves)
+        approver.assertApproved(http(Request(GET, "/game/$gameId")).expectOK())
     }
 
     @Test fun `game ends in a draw`(approver: Approver) {
-        gameStore.makeMoves(id, gameEndsInDrawMoves)
-        approver.assertApproved(http(Request(GET, "/game/$id")).expectOK())
+        gameStore.makeMoves(gameId, gameEndsInDrawMoves)
+        approver.assertApproved(http(Request(GET, "/game/$gameId")).expectOK())
     }
 
     @Test fun `can't make moves after game is over`(approver: Approver) {
-        gameStore.makeMoves(id, playerXWinningMoves)
-        approver.assertApproved(http(Request(GET, "/game/$id/move?x=1&y=1")).expectOK())
+        gameStore.makeMoves(gameId, playerXWinningMoves)
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK())
     }
 
     @Test fun `duplicate move`(approver: Approver) {
-        http(Request(GET, "/game/$id/move?x=1&y=1")).expectOK()
-        approver.assertApproved(http(Request(GET, "/game/$id/move?x=1&y=1")).expectOK())
+        http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK()
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK())
     }
 
     @Test fun `out of range moves`(approver: Approver) {
-        approver.assertApproved(http(Request(GET, "/game/$id/move?x=-123&y=234")).expectOK())
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=-123&y=234")).expectOK())
     }
 
     @Test fun `missing arguments on move request`(approver: Approver) {
-        approver.assertApproved(http(Request(GET, "/game/$id/move")).expectOK())
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move")).expectOK())
     }
 
     @Test fun `invalid arguments on move request`(approver: Approver) {
-        approver.assertApproved(http(Request(GET, "/game/$id/move?x=foo&y=bar")).expectOK())
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=foo&y=bar")).expectOK())
     }
 
     @Test fun `receive SSE updates`() {
-        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/events?gameId=$id"))
-        http(Request(GET, "/game/$id/move?x=0&y=0")).expectOK()
-        http(Request(GET, "/game/$id/move?x=0&y=1")).expectOK()
+        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/events?gameId=$gameId"))
+        http(Request(GET, "/game/$gameId/move?x=0&y=0")).expectOK()
+        http(Request(GET, "/game/$gameId/move?x=0&y=1")).expectOK()
 
         expectThat(sseClient.received().toList()).isEqualTo(
             listOf(
-                SseMessage.Event("connected", id.value),
-                SseMessage.Event("update", id.value),
-                SseMessage.Event("update", id.value),
+                SseMessage.Event("connected", gameId.value),
+                SseMessage.Event("update", gameId.value),
+                SseMessage.Event("update", gameId.value),
             )
         )
     }
