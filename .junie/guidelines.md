@@ -34,3 +34,4 @@ Kotlin code style:
 - import enum values if possible
 - use expression functions if possible
 - use not-nullable types if possible
+- don't use `internal` to expose functions and classes for testing
