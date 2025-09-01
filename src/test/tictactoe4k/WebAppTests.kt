@@ -5,8 +5,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.ClientFilters.FollowRedirects
+import org.http4k.sse.SseMessage
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
+import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import strikt.api.expectThat
@@ -76,6 +78,20 @@ class WebAppTests {
 
     @Test fun `invalid arguments on move request`(approver: Approver) {
         approver.assertApproved(http(Request(GET, "/game/$id/move?x=foo&y=bar")).expectOK())
+    }
+
+    @Test fun `receive SSE updates`() {
+        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/events?gameId=$id"))
+        http(Request(GET, "/game/$id/move?x=0&y=0")).expectOK()
+        http(Request(GET, "/game/$id/move?x=0&y=1")).expectOK()
+
+        expectThat(sseClient.received().toList()).isEqualTo(
+            listOf(
+                SseMessage.Event("connected", id.value),
+                SseMessage.Event("update", "reload"),
+                SseMessage.Event("update", "reload"),
+            )
+        )
     }
 
     @IgnorableReturnValue

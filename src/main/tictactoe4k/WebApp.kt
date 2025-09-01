@@ -60,7 +60,7 @@ class WebApp(val gameStore: GameStore) {
     }
 
     private fun Request.parseGameId() =
-        path("gameId")!!.let(::GameId)
+        (query("gameId") ?: path("gameId"))!!.let(::GameId)
 
     private fun subscribeToGameEvents(sse: Sse) {
         val gameId = sse.connectRequest.parseGameId()
