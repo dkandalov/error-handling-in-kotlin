@@ -88,8 +88,8 @@ class WebAppTests {
         expectThat(sseClient.received().toList()).isEqualTo(
             listOf(
                 SseMessage.Event("connected", id.value),
-                SseMessage.Event("update", "reload"),
-                SseMessage.Event("update", "reload"),
+                SseMessage.Event("update", id.value),
+                SseMessage.Event("update", id.value),
             )
         )
     }

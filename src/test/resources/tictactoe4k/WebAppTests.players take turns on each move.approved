@@ -1,5 +1,6 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="/static/styles.css">
+<script src="/static/game.js"></script>
 <body>
 <div class="game">
 <p class="row">
@@ -20,9 +21,6 @@
     </p>
 </div>
 <script>
-    (function() {
-        const es = new EventSource("/game/events?gameId=some-game-id");
-        es.addEventListener("update", function() { location.reload(); });
-    })();
+    onPageLoad();
 </script>
 </body>

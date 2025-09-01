@@ -1,5 +1,6 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="/static/styles.css">
+<script src="/static/game.js"></script>
 <body>
 <div class="game">
 {{#each rows~}}
@@ -25,9 +26,6 @@
 {{~/if~}}
 </div>
 <script>
-    (function() {
-        const es = new EventSource("/game/events?gameId={{gameId}}");
-        es.addEventListener("update", function() { location.reload(); });
-    })();
+    onPageLoad();
 </script>
 </body>

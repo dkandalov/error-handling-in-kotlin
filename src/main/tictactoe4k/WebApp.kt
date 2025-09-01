@@ -73,7 +73,7 @@ class WebApp(val gameStore: GameStore) {
     private fun broadcastUpdate(gameId: GameId) {
         subscribersByGame[gameId]?.forEach { client ->
             try {
-                client.send(SseMessage.Event("update", "reload"))
+                client.send(SseMessage.Event("update", gameId.value))
             } catch (_: Exception) {
                 subscribersByGame[gameId]?.remove(client)
             }
