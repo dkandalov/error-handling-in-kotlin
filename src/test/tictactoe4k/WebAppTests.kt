@@ -75,6 +75,11 @@ class WebAppTests {
         approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1")).expectOK())
     }
 
+    @Test fun `same player makes two moves in a row`(approver: Approver) {
+        http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userid", "user-O")).expectOK()
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=2&y=2").cookie("userid", "user-O")).expectOK())
+    }
+
     @Test fun `out of range moves`(approver: Approver) {
         approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=-123&y=234")).expectOK())
     }
