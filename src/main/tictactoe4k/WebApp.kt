@@ -17,10 +17,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
-import tictactoe4k.game.Game
-import tictactoe4k.game.GameId
-import tictactoe4k.game.GameStore
-import tictactoe4k.game.UserId
+import tictactoe4k.game.*
 import java.util.concurrent.ConcurrentHashMap
 
 class WebApp(val gameStore: GameStore) {
@@ -59,9 +56,6 @@ class WebApp(val gameStore: GameStore) {
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
-    private fun Request.parseGameId() =
-        (query("gameId") ?: path("gameId"))!!.let(::GameId)
-
     private fun subscribeToGameEvents(sse: Sse) {
         val gameId = sse.connectRequest.parseGameId()
         val subscribers = subscribersByGame.getOrPut(gameId) { ConcurrentHashMap.newKeySet() }
@@ -80,6 +74,9 @@ class WebApp(val gameStore: GameStore) {
         }
     }
 }
+
+private fun Request.parseGameId() =
+    (query("gameId") ?: path("gameId"))!!.let(::GameId)
 
 private class GameView(
     val gameId: String,
@@ -109,6 +106,9 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
         try {
             handler(request)
+        } catch (e: WrongPlayerMove) {
+            val gameId = request.parseGameId()
+            Response(SEE_OTHER).header("Location", "/game/$gameId")
         } catch (e: Exception) {
             e.printStackTrace()
             Response(OK).html(htmlRenderer(ErrorView(message = "Something went wrong 😭")))
