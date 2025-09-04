@@ -16,8 +16,10 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
-import org.http4k.template.ViewModel
-import tictactoe4k.game.*
+import tictactoe4k.game.GameId
+import tictactoe4k.game.GameStore
+import tictactoe4k.game.UserId
+import tictactoe4k.game.WrongPlayerMove
 import java.util.concurrent.ConcurrentHashMap
 
 class WebApp(val gameStore: GameStore) {
@@ -77,30 +79,6 @@ class WebApp(val gameStore: GameStore) {
 
 private fun Request.parseGameId() =
     (query("gameId") ?: path("gameId"))!!.let(::GameId)
-
-private class GameView(
-    val gameId: String,
-    val rows: List<List<CellView>>,
-    val winner: String?,
-    val isOver: Boolean,
-) : ViewModel
-
-private fun GameView(game: Game, gameId: GameId) =
-    GameView(
-        gameId = gameId.value,
-        rows = (0..2).map { x ->
-            (0..2).map { y ->
-                val player = game.moves.find { it.x == x && it.y == y }?.player?.name
-                CellView(x, y, player)
-            }
-        },
-        winner = game.winner?.name,
-        isOver = game.isOver
-    )
-
-private class CellView(val x: Int, val y: Int, val player: String?)
-
-private class ErrorView(val message: String, val gameId: String? = null) : ViewModel
 
 private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRenderer) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
