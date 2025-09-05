@@ -25,6 +25,6 @@ private fun WebApp.startOn(port: Int) {
 
 private data class Config(
     val port: Int = System.getenv("PORT")?.toInt() ?: 8080,
-    val useInMemoryStore: Boolean = System.getenv("IN_MEMORY_STORE")?.toBoolean() ?: true,
+    val useInMemoryStore: Boolean = System.getenv("IN_MEMORY_STORE")?.toBooleanStrict() ?: true,
     val h2JdbcUrl: String = System.getenv("JDBC_DATABASE_URL") ?: "jdbc:h2:file:./data",
 )
