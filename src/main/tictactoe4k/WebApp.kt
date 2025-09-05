@@ -32,7 +32,7 @@ class WebApp(val gameStore: GameStore) {
         ).withFilter(HandleUnexpectedExceptions(htmlRenderer)).withFilter(UserIdCookieFilter(gameStore))
 
     private val subscribersByGame = ConcurrentHashMap<GameId, MutableSet<Sse>>()
-    val sseHandler = sse("/game/events" bind ::subscribeToGameEvents)
+    val sseHandler = sse("/game/{gameId}/events" bind ::subscribeToGameEvents)
 
     private fun newGame(): Response {
         val gameId = gameStore.newGame()
@@ -83,7 +83,7 @@ class WebApp(val gameStore: GameStore) {
 }
 
 private fun Request.parseGameId() =
-    (query("gameId") ?: path("gameId"))!!.let(::GameId)
+    path("gameId")!!.let(::GameId)
 
 private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRenderer) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
