@@ -1,5 +1,7 @@
 package tictactoe4k.game
 
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.map
 import java.sql.Connection
 import java.sql.DriverManager
 import java.util.*
@@ -100,9 +102,9 @@ class H2GameStore(
         return Game(moves)
     }
 
-    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) {
+    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Result<Unit, GameException> {
         ensureGameExists(id)
-        useConnection { connection ->
+        return useConnection { connection ->
             val existingPlayer = connection.prepareStatement(
                 "select player from game_users where game_id = ? and user_id = ?"
             ).use { ps ->
@@ -146,21 +148,23 @@ class H2GameStore(
                 } + 1
 
             val move = Move(x, y, player)
-            val updatedGame = findGame(id).makeMove(move)
-            val newMove = updatedGame.moves.last()
+            findGame(id).makeMove_(move)
+                .map { updatedGame ->
+                    val newMove = updatedGame.moves.last()
 
-            connection.prepareStatement(
-                "insert into moves(game_id, seq, x, y, player, user_id) values (?, ?, ?, ?, ?, ?)"
-            ).use { ps ->
-                ps.setString(1, id.value)
-                ps.setInt(2, nextSeq)
-                ps.setInt(3, newMove.x)
-                ps.setInt(4, newMove.y)
-                ps.setString(5, newMove.player.name)
-                ps.setString(6, userId.value)
-                ps.executeUpdate()
-            }
-            connection.commit()
+                    val _ = connection.prepareStatement(
+                        "insert into moves(game_id, seq, x, y, player, user_id) values (?, ?, ?, ?, ?, ?)"
+                    ).use {
+                        it.setString(1, id.value)
+                        it.setInt(2, nextSeq)
+                        it.setInt(3, newMove.x)
+                        it.setInt(4, newMove.y)
+                        it.setString(5, newMove.player.name)
+                        it.setString(6, userId.value)
+                        it.executeUpdate()
+                    }
+                    connection.commit()
+                }
         }
     }
 

@@ -1,9 +1,11 @@
 package tictactoe4k.game
 
+import dev.forkhandles.result4k.Result
+
 interface GameStore {
     fun newGame(): GameId
     fun findGame(id: GameId): Game
-    fun makeMove(id: GameId, x: Int, y: Int, userId: UserId)
+    fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Result<Unit, GameException>
     fun newUserId(): UserId
 }
 
