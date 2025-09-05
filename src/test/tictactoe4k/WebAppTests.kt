@@ -3,6 +3,7 @@ package tictactoe4k
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.cookie
 import org.http4k.filter.ClientFilters.FollowRedirects
@@ -104,6 +105,11 @@ class WebAppTests {
                 SseMessage.Event("update", gameId.value),
             )
         )
+    }
+
+    @Test fun `can't subscribe to SSE if the game doesn't exist`() {
+        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/events?gameId=non-existent-id"))
+        expectThat(sseClient.status).isEqualTo(NOT_FOUND)
     }
 
     @IgnorableReturnValue
