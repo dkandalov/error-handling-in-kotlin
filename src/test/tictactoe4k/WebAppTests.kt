@@ -107,6 +107,18 @@ class WebAppTests {
         )
     }
 
+    @Test fun `receive SSE updates for the new game when it's started`() {
+        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/$gameId/events?gameId=$gameId"))
+        http(Request(GET, "/?gameId=$gameId")).expectOK()
+
+        expectThat(sseClient.received().toList()).isEqualTo(
+            listOf(
+                SseMessage.Event("connected", gameId.value),
+                SseMessage.Event("update", "2"),
+            )
+        )
+    }
+
     @Test fun `can't subscribe to SSE if the game doesn't exist`() {
         val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/non-existent-id/events?gameId=non-existent-id"))
         expectThat(sseClient.status).isEqualTo(NOT_FOUND)

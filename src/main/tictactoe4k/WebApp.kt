@@ -15,6 +15,7 @@ import org.http4k.routing.*
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
+import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseResponse
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.TemplateRenderer
@@ -36,6 +37,12 @@ class WebApp(val gameStore: GameStore) {
 
     private fun newGame(request: Request): Response {
         val gameId = gameStore.newGame()
+        val oldGameId = request.query("gameId")?.let(::GameId)
+        if (oldGameId != null) {
+            subscribersByGame[oldGameId]?.broadcast(Event("update", gameId.value))
+            subscribersByGame.remove(oldGameId)
+        }
+
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
@@ -52,7 +59,7 @@ class WebApp(val gameStore: GameStore) {
         val userId = UserId(request.cookie("userid")!!.value)
 
         gameStore.makeMove(gameId, x, y, userId)
-        broadcastUpdate(gameId)
+        subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
 
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
@@ -65,25 +72,25 @@ class WebApp(val gameStore: GameStore) {
                 val subscribers = subscribersByGame.getOrPut(gameId) { ConcurrentHashMap.newKeySet() }
                 subscribers.add(sse)
                 sse.onClose { subscribers.remove(sse) }
-                sse.send(SseMessage.Event("connected", gameId.value))
+                sse.send(Event("connected", gameId.value))
             }
         } catch (e: GameNotFound) {
             SseResponse(status = NOT_FOUND, consumer = {})
         }
 
-    private fun broadcastUpdate(gameId: GameId) {
-        subscribersByGame[gameId]?.forEach { sse ->
+    private fun MutableSet<Sse>.broadcast(message: SseMessage) {
+        forEach { sse ->
             try {
-                sse.send(SseMessage.Event("update", gameId.value))
+                sse.send(message)
             } catch (_: Exception) {
-                subscribersByGame[gameId]?.remove(sse)
+                remove(sse)
             }
         }
     }
 }
 
 private fun Request.parseGameId() =
-    (query("gameId") ?: path("gameId"))!!.let(::GameId)
+    path("gameId")!!.let(::GameId)
 
 private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRenderer) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
