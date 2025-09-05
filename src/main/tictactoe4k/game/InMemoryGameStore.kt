@@ -1,5 +1,6 @@
 package tictactoe4k.game
 
+import dev.forkhandles.result4k.map
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -27,8 +28,8 @@ class InMemoryGameStore(
                 else -> throw GameException("Cannot make the move. There are already two players.")
             }
         }
-        val updatedGame = findGame(id).makeMove(Move(x, y, player))
-        gamesById[id] = updatedGame
+        findGame(id).makeMove_(Move(x, y, player))
+            .map { updatedGame -> gamesById[id] = updatedGame }
     }
 
     override fun newUserId() =
