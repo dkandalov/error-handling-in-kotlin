@@ -60,13 +60,11 @@ class WebApp(val gameStore: GameStore) {
 
         try {
             gameStore.makeMove(gameId, x, y, userId)
+            subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
+            return Response(SEE_OTHER).header("Location", "/game/$gameId")
         } catch (_: WrongPlayerMove) {
-            val gameId = request.parseGameId()
-            Response(SEE_OTHER).header("Location", "/game/$gameId")
+            return Response(SEE_OTHER).header("Location", "/game/$gameId")
         }
-        subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
-
-        return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =
