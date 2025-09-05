@@ -25,7 +25,7 @@ class WebApp(val gameStore: GameStore) {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
     val httpHandler =
         routes(
-            "/" bind GET to { newGame() },
+            "/" bind GET to ::newGame,
             "/game/{gameId}" bind GET to ::findGame,
             "/game/{gameId}/move" bind GET to ::makeMove,
             "/static" bind static(ResourceLoader.Classpath("public"))
@@ -34,7 +34,7 @@ class WebApp(val gameStore: GameStore) {
     private val subscribersByGame = ConcurrentHashMap<GameId, MutableSet<Sse>>()
     val sseHandler = sse("/game/{gameId}/events" bind ::subscribeToGameEvents)
 
-    private fun newGame(): Response {
+    private fun newGame(request: Request): Response {
         val gameId = gameStore.newGame()
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
@@ -72,18 +72,18 @@ class WebApp(val gameStore: GameStore) {
         }
 
     private fun broadcastUpdate(gameId: GameId) {
-        subscribersByGame[gameId]?.forEach { client ->
+        subscribersByGame[gameId]?.forEach { sse ->
             try {
-                client.send(SseMessage.Event("update", gameId.value))
+                sse.send(SseMessage.Event("update", gameId.value))
             } catch (_: Exception) {
-                subscribersByGame[gameId]?.remove(client)
+                subscribersByGame[gameId]?.remove(sse)
             }
         }
     }
 }
 
 private fun Request.parseGameId() =
-    path("gameId")!!.let(::GameId)
+    (query("gameId") ?: path("gameId"))!!.let(::GameId)
 
 private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRenderer) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
