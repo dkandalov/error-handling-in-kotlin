@@ -96,7 +96,7 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
         try {
             handler(request)
-        } catch (e: WrongPlayerMove) {
+        } catch (_: WrongPlayerMove) {
             val gameId = request.parseGameId()
             Response(SEE_OTHER).header("Location", "/game/$gameId")
         } catch (e: Exception) {
