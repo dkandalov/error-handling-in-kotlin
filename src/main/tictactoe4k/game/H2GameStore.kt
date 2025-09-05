@@ -51,23 +51,23 @@ class H2GameStore(
         val id = generateId()
         val game = Game()
         useConnection { connection ->
-            connection.prepareStatement("insert into games(id) values (?)").use { ps ->
-                ps.setString(1, id)
-                ps.executeUpdate()
+            val _ = connection.prepareStatement("insert into games(id) values (?)").use {
+                it.setString(1, id)
+                it.executeUpdate()
             }
             if (game.moves.isNotEmpty()) {
-                connection.prepareStatement(
+                val _ = connection.prepareStatement(
                     "insert into moves(game_id, seq, x, y, player) values (?, ?, ?, ?, ?)"
-                ).use { ps ->
+                ).use {
                     game.moves.forEachIndexed { index, move ->
-                        ps.setString(1, id)
-                        ps.setInt(2, index)
-                        ps.setInt(3, move.x)
-                        ps.setInt(4, move.y)
-                        ps.setString(5, move.player.name)
-                        ps.addBatch()
+                        it.setString(1, id)
+                        it.setInt(2, index)
+                        it.setInt(3, move.x)
+                        it.setInt(4, move.y)
+                        it.setString(5, move.player.name)
+                        it.addBatch()
                     }
-                    ps.executeBatch()
+                    it.executeBatch()
                 }
             }
             connection.commit()
@@ -128,13 +128,13 @@ class H2GameStore(
                         1 -> Player.O
                         else -> throw GameException("Cannot make the move. There are already two players.")
                     }
-                    connection.prepareStatement(
+                    val _ = connection.prepareStatement(
                         "insert into game_users(game_id, user_id, player) values (?, ?, ?)"
-                    ).use { ps ->
-                        ps.setString(1, id.value)
-                        ps.setString(2, userId.value)
-                        ps.setString(3, assignedPlayer.name)
-                        ps.executeUpdate()
+                    ).use {
+                        it.setString(1, id.value)
+                        it.setString(2, userId.value)
+                        it.setString(3, assignedPlayer.name)
+                        it.executeUpdate()
                     }
                     assignedPlayer
                 }
@@ -149,16 +149,16 @@ class H2GameStore(
             val updatedGame = findGame(id).makeMove(move)
             val newMove = updatedGame.moves.last()
 
-            connection.prepareStatement(
+            val _ = connection.prepareStatement(
                 "insert into moves(game_id, seq, x, y, player, user_id) values (?, ?, ?, ?, ?, ?)"
-            ).use { ps ->
-                ps.setString(1, id.value)
-                ps.setInt(2, nextSeq)
-                ps.setInt(3, newMove.x)
-                ps.setInt(4, newMove.y)
-                ps.setString(5, newMove.player.name)
-                ps.setString(6, userId.value)
-                ps.executeUpdate()
+            ).use {
+                it.setString(1, id.value)
+                it.setInt(2, nextSeq)
+                it.setInt(3, newMove.x)
+                it.setInt(4, newMove.y)
+                it.setString(5, newMove.player.name)
+                it.setString(6, userId.value)
+                it.executeUpdate()
             }
             connection.commit()
         }
