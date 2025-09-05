@@ -21,7 +21,7 @@
     </p>
 X wins!! 🥳
     <br/>
-    <a href="/">Start new game</a>?</div>
+    <a href="/?gameId=some-game-id">Start new game</a>?</div>
 <script>
     onPageLoad('some-game-id');
 </script>
