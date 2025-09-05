@@ -10,7 +10,7 @@ fun main() {
     val config = Config()
     val gameStore =
         if (config.useInMemoryStore) InMemoryGameStore()
-        else H2GameStore(config.h2JdbcUrl)
+        else H2GameStore(config.h2JdbcUrl).init()
     val webApp = WebApp(gameStore)
 
     poly(webApp.httpHandler, webApp.sseHandler).asServer(Jetty11(port = config.port)).start()
@@ -19,6 +19,6 @@ fun main() {
 
 data class Config(
     val port: Int = System.getenv("PORT")?.toInt() ?: 8080,
-    val useInMemoryStore: Boolean = System.getenv("IN_MEMORY_STORE")?.toBoolean() ?: false,
+    val useInMemoryStore: Boolean = System.getenv("IN_MEMORY_STORE")?.toBoolean() ?: true,
     val h2JdbcUrl: String = System.getenv("JDBC_DATABASE_URL") ?: "jdbc:h2:file:./data",
 )
