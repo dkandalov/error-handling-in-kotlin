@@ -8,7 +8,9 @@ data class Game(val moves: List<Move> = emptyList()) {
     val isOver = winner != null || moves.size == 9
     val nextPlayer = if (isOver) null else if (moves.lastOrNull()?.player == X) O else X
 
-    fun makeMove(move: Move): Game {
+    fun makeMove(move: Move): Game = makeMove_(move)
+
+    fun makeMove_(move: Move): Game {
         if (isOver) throw MoveAfterGameOver()
         if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move.x, move.y)
         if (moves.any { it.x == move.x && it.y == move.y }) throw DuplicateMove(move.x, move.y)
