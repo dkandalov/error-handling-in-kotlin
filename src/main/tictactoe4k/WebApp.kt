@@ -30,7 +30,8 @@ class WebApp(val gameStore: GameStore) {
             "/game/{gameId}" bind GET to ::findGame,
             "/game/{gameId}/move" bind GET to ::makeMove,
             "/static" bind static(ResourceLoader.Classpath("public"))
-        ).withFilter(HandleUnexpectedExceptions(htmlRenderer)).withFilter(UserIdCookieFilter(gameStore))
+        ).withFilter(HandleUnexpectedExceptions(htmlRenderer))
+            .withFilter(UserIdCookieFilter(gameStore))
 
     private val subscribersByGame = ConcurrentHashMap<GameId, MutableSet<Sse>>()
     val sseHandler = sse("/game/{gameId}/events" bind ::subscribeToGameEvents)
