@@ -6,7 +6,7 @@ import java.util.*
 class H2GameStore(
     private val jdbcUrl: String,
     private val generateId: () -> String = { UUID.randomUUID().toString() },
-) : GameStore {
+) : GameStore, AutoCloseable {
     private val connection by lazy { DriverManager.getConnection(jdbcUrl) }
 
     fun init() = apply {
@@ -168,5 +168,9 @@ class H2GameStore(
             it.executeQuery().use { rs -> rs.next() }
         }
         if (!exists) throw GameNotFound(gameId)
+    }
+
+    override fun close() {
+        connection.close()
     }
 }
