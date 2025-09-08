@@ -59,10 +59,10 @@ class WebApp(val gameStore: GameStore) {
         val y = request.query("y")!!.toInt()
         val userId = UserId(request.cookie("userid")!!.value)
 
-        gameStore.makeMove(gameId, x, y, userId)
+        val updatedGame = gameStore.makeMove(gameId, x, y, userId)
         subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
 
-        return Response(SEE_OTHER).header("Location", "/game/$gameId")
+        return Response(OK).html(htmlRenderer(GameView(updatedGame, gameId)))
     }
 
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =

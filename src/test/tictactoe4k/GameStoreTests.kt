@@ -29,34 +29,46 @@ abstract class GameStoreTests(private val store: GameStore) {
     @Test fun `users take turns in the game`() {
         val id = store.newGame()
 
-        store.makeMove(id, 0, 0, UserId("user-1"))
-        store.makeMove(id, 1, 1, UserId("user-2"))
-        store.makeMove(id, 2, 2, UserId("user-1"))
+        expectThat(store.makeMove(id, 0, 0, UserId("user-1")))
+            .isEqualTo(Game(listOf(
+                Move(0, 0, X)
+            )))
 
-        expectThat(store.findGame(id)).isEqualTo(Game(listOf(
-            Move(0, 0, X),
-            Move(1, 1, O),
-            Move(2, 2, X)
-        )))
+        expectThat(store.makeMove(id, 1, 1, UserId("user-2")))
+            .isEqualTo(Game(listOf(
+                Move(0, 0, X),
+                Move(1, 1, O)
+            )))
+
+        expectThat(store.makeMove(id, 2, 2, UserId("user-1")))
+            .isEqualTo(Game(listOf(
+                Move(0, 0, X),
+                Move(1, 1, O),
+                Move(2, 2, X)
+            )))
     }
 
     @Test fun `games are updated independently`() {
         val id1 = store.newGame()
         val id2 = store.newGame()
 
-        store.makeMove(id1, 0, 0, UserId("some-user"))
-        store.makeMove(id2, 1, 1, UserId("some-user"))
+        expectThat(store.makeMove(id1, 0, 0, UserId("some-user")))
+            .isEqualTo(Game(listOf(Move(0, 0, X))))
 
-        expectThat(store.findGame(id1)).isEqualTo(Game(listOf(Move(0, 0, X))))
-        expectThat(store.findGame(id2)).isEqualTo(Game(listOf(Move(1, 1, X))))
+        expectThat(store.makeMove(id2, 1, 1, UserId("some-user")))
+            .isEqualTo(Game(listOf(Move(1, 1, X))))
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't find non-existent game`() {
-        assertFailsWith<GameNotFound> { store.findGame(GameId("non-existent-id")) }
+        assertFailsWith<GameNotFound> {
+            store.findGame(GameId("non-existent-id"))
+        }
     }
 
     @Test fun `can't make move in non-existent game`() {
-        assertFailsWith<GameNotFound> { store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user")) }
+        assertFailsWith<GameNotFound> {
+            val _ = store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user"))
+        }
     }
 }

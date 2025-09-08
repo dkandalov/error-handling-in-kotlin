@@ -133,7 +133,7 @@ class WebAppTests {
     private fun GameStore.makeMoves(id: GameId, moves: List<Move>) {
         val alternateUsers = generateSequence { sequenceOf(UserId("user-X"), UserId("user-O")) }.flatten()
         moves.asSequence().zip(alternateUsers).forEach { (move, user) ->
-            makeMove(id, move.x, move.y, user)
+            val _ = makeMove(id, move.x, move.y, user)
         }
     }
 }

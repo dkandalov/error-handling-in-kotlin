@@ -95,7 +95,7 @@ class H2GameStore(
         return Game(moves)
     }
 
-    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) {
+    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game {
         ensureGameExists(id)
         val existingPlayer = connection.prepareStatement(
             "select player from game_users where game_id = ? and user_id = ?"
@@ -157,6 +157,8 @@ class H2GameStore(
             it.executeUpdate()
         }
         connection.commit()
+
+        return updatedGame
     }
 
     override fun newUserId() =
