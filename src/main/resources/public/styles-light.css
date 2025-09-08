@@ -6,8 +6,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
-    color: #e5e7eb;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+    color: #111827;
 }
 
 .game {
@@ -21,9 +21,9 @@ body {
 
 a {
     text-decoration: none;
-    color: #93c5fd;
+    color: #2563eb;
 }
 
 a:hover {
-    color: #bfdbfe;
+    color: #1d4ed8;
 }
