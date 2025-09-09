@@ -120,7 +120,7 @@ class WebAppTests {
     }
 
     @Test fun `can't subscribe to SSE if the game doesn't exist`() {
-        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/non-existent-id/events?gameId=non-existent-id"))
+        val sseClient = webApp.sseHandler.testSseClient(Request(GET, "/game/non-existent-id/events"))
         expectThat(sseClient.status).isEqualTo(NOT_FOUND)
     }
 

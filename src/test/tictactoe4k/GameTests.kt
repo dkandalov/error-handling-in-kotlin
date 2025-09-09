@@ -60,19 +60,29 @@ class GameTests {
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves outside of the board`() {
-        assertFailsWith<OutOfRangeMove> { Game().makeMove(Move(-1, 0, X)) }
-        assertFailsWith<OutOfRangeMove> { Game().makeMove(Move(0, 3, X)) }
+        assertFailsWith<OutOfRangeMove> {
+            Game().makeMove(Move(-1, 0, X))
+        }
+        assertFailsWith<OutOfRangeMove> {
+            Game().makeMove(Move(0, 3, X))
+        }
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves when the game is over`() {
-        assertFailsWith<MoveAfterGameOver> { Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, X)) }
+        assertFailsWith<MoveAfterGameOver> {
+            Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, X))
+        }
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves with wrong player`() {
-        assertFailsWith<WrongPlayerMove> { Game().makeMove(Move(0, 0, O)) }
-        assertFailsWith<WrongPlayerMove> { Game().makeMove(Move(0, 0, X)).makeMove(Move(0, 1, X)) }
+        assertFailsWith<WrongPlayerMove> {
+            Game().makeMove(Move(0, 0, O))
+        }
+        assertFailsWith<WrongPlayerMove> {
+            Game().makeMove(Move(0, 0, X)).makeMove(Move(0, 1, X))
+        }
     }
 
     private fun Game.makeMoves(moves: List<Move>) =
