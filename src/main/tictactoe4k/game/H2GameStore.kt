@@ -73,7 +73,8 @@ class H2GameStore(
     }
 
     override fun findGame(id: GameId): Game {
-        ensureGameExists(id)
+        if (!checkGameExists(id)) throw GameNotFound(id)
+
         val moves = mutableListOf<Move>()
         connection.prepareStatement(
             "select x, y, player from moves where game_id = ? order by seq asc"
@@ -96,7 +97,7 @@ class H2GameStore(
     }
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game {
-        ensureGameExists(id)
+        if (!checkGameExists(id)) throw GameNotFound(id)
         val existingPlayer = connection.prepareStatement(
             "select player from game_users where game_id = ? and user_id = ?"
         ).use {
@@ -164,13 +165,11 @@ class H2GameStore(
     override fun newUserId() =
         UserId(generateId())
 
-    private fun ensureGameExists(gameId: GameId) {
-        val exists = connection.prepareStatement("select 1 from games where id = ?").use {
+    private fun checkGameExists(gameId: GameId) =
+        connection.prepareStatement("select 1 from games where id = ?").use {
             it.setString(1, gameId.value)
             it.executeQuery().use { rs -> rs.next() }
         }
-        if (!exists) throw GameNotFound(gameId)
-    }
 
     override fun close() {
         connection.close()
