@@ -75,29 +75,31 @@ class H2GameStore(
     override fun findGame(id: GameId): Game {
         if (!checkGameExists(id)) throw GameNotFound(id)
 
-        val moves = mutableListOf<Move>()
-        connection.prepareStatement(
-            "select x, y, player from moves where game_id = ? order by seq asc"
-        ).use {
-            it.setString(1, id.value)
-            it.executeQuery().use { resultSet ->
-                while (resultSet.next()) {
-                    val x = resultSet.getInt(1)
-                    val y = resultSet.getInt(2)
-                    val player = when (resultSet.getString(3)) {
-                        "X" -> Player.X
-                        "O" -> Player.O
-                        else -> error("Unknown player")
+        return connection
+            .prepareStatement("select x, y, player from moves where game_id = ? order by seq asc")
+            .use {
+                it.setString(1, id.value)
+                val moves = mutableListOf<Move>()
+                it.executeQuery().use { resultSet ->
+                    while (resultSet.next()) {
+                        moves.add(Move(
+                            x = resultSet.getInt(1),
+                            y = resultSet.getInt(2),
+                            player = when (resultSet.getString(3)) {
+                                "X" -> Player.X
+                                "O" -> Player.O
+                                else -> error("Unknown player")
+                            }
+                        ))
                     }
-                    moves.add(Move(x, y, player))
                 }
+                Game(moves)
             }
-        }
-        return Game(moves)
     }
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game {
         if (!checkGameExists(id)) throw GameNotFound(id)
+
         val existingPlayer = connection.prepareStatement(
             "select player from game_users where game_id = ? and user_id = ?"
         ).use {
