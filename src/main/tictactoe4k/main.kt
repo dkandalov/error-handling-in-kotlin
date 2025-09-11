@@ -30,7 +30,7 @@ data class Config(
 ) {
     constructor(map: Map<String, String> = System.getenv()) : this(
         port = map["PORT"]?.toInt() ?: 8080,
-        useInMemoryStore = map["IN_MEMORY_STORE"]?.toBooleanStrict() ?: true,
+        useInMemoryStore = map["IN_MEMORY_STORE"]?.toBoolean() ?: true,
         jdbcUrl = map["JDBC_DATABASE_URL"] ?: "jdbc:h2:file:./data",
     )
 }

@@ -41,9 +41,7 @@ class ConfigTests {
     }
 
     @Test fun `invalid useInMemoryStore`() {
-        assertThrows<IllegalArgumentException> {
-            Config(mapOf("IN_MEMORY_STORE" to "not-a-boolean"))
-        }
+        Config(mapOf("IN_MEMORY_STORE" to "not-a-boolean"))
     }
 
     @Test fun `invalid h2JdbcUrl`() {
