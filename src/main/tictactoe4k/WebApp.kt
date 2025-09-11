@@ -59,7 +59,12 @@ class WebApp(val gameStore: GameStore) {
         val y = request.query("y")!!.toInt()
         val userId = UserId(request.cookie("userid")!!.value)
 
-        val updatedGame = gameStore.makeMove(gameId, x, y, userId)
+        val updatedGame = try {
+            gameStore.makeMove(gameId, x, y, userId)
+        } catch (e: WrongPlayerMove) {
+            val gameId = request.parseGameId()
+            return Response(SEE_OTHER).header("Location", "/game/$gameId")
+        }
         subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
 
         return Response(OK).html(htmlRenderer(GameView(updatedGame, gameId)))
@@ -97,9 +102,6 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
         try {
             handler(request)
-        } catch (e: WrongPlayerMove) {
-            val gameId = request.parseGameId()
-            Response(SEE_OTHER).header("Location", "/game/$gameId")
         } catch (e: Exception) {
             e.printStackTrace()
             Response(OK).html(htmlRenderer(ErrorView(message = "Something went wrong 😭")))
