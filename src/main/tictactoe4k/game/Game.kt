@@ -9,9 +9,9 @@ data class Game(val moves: List<Move> = emptyList()) {
     val nextPlayer = if (isOver) null else if (moves.lastOrNull()?.player == X) O else X
 
     fun makeMove(move: Move): Game {
-        if (isOver) throw MoveAfterGameOver()
-        if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move.x, move.y)
-        if (moves.any { it.x == move.x && it.y == move.y }) throw DuplicateMove(move.x, move.y)
+        if (isOver) throw MoveAfterGameOver(move)
+        if (move.x !in 0..2 || move.y !in 0..2) throw OutOfRangeMove(move)
+        if (moves.any { it.x == move.x && it.y == move.y }) throw DuplicateMove(move)
         if (move.player != nextPlayer) throw WrongPlayerMove(move.player)
 
         return Game(moves + move)
@@ -39,7 +39,7 @@ data class Move(
 enum class Player { X, O }
 
 open class GameException(message: String? = null) : Exception(message)
-class MoveAfterGameOver : GameException("You can't move after the game is over")
-data class OutOfRangeMove(val x: Int, val y: Int) : GameException("Out of range: x=$x, y=$y")
-data class DuplicateMove(val x: Int, val y: Int) : GameException("Duplicate move at x=$x, y=$y")
+data class MoveAfterGameOver(val move: Move) : GameException("Can't move after the game is over: x=${move.x}, y=${move.y}")
+data class OutOfRangeMove(val move: Move) : GameException("Out of range: x=${move.x}, y=${move.y}")
+data class DuplicateMove(val move: Move) : GameException("Duplicate move at x=${move.x}, y=${move.y}")
 data class WrongPlayerMove(val player: Player) : GameException("It's not $player's turn")
