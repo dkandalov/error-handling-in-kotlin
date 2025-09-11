@@ -24,7 +24,13 @@ private fun WebApp.startOn(port: Int) {
 }
 
 private data class Config(
-    val port: Int = System.getenv("PORT")?.toInt() ?: 8080,
-    val useInMemoryStore: Boolean = System.getenv("IN_MEMORY_STORE")?.toBoolean() ?: true,
-    val h2JdbcUrl: String = System.getenv("JDBC_DATABASE_URL") ?: "jdbc:h2:file:./data",
-)
+    val port: Int,
+    val useInMemoryStore: Boolean,
+    val h2JdbcUrl: String,
+) {
+    constructor(map: Map<String, String> = System.getenv()) : this(
+        port = map["PORT"]?.toInt() ?: 8080,
+        useInMemoryStore = map["IN_MEMORY_STORE"]?.toBoolean() ?: true,
+        h2JdbcUrl = map["JDBC_DATABASE_URL"] ?: "jdbc:h2:file:./data",
+    )
+}
