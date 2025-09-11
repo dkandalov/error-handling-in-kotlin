@@ -124,7 +124,6 @@ class WebAppTests {
         expectThat(sseClient.status).isEqualTo(NOT_FOUND)
     }
 
-    @IgnorableReturnValue
     private fun Response.expectOK(): Response {
         expectThat(status).isEqualTo(OK)
         return this
@@ -133,7 +132,7 @@ class WebAppTests {
     private fun GameStore.makeMoves(id: GameId, moves: List<Move>) {
         val alternateUsers = generateSequence { sequenceOf(UserId("user-X"), UserId("user-O")) }.flatten()
         moves.asSequence().zip(alternateUsers).forEach { (move, user) ->
-            val _ = makeMove(id, move.x, move.y, user)
+            makeMove(id, move.x, move.y, user)
         }
     }
 }

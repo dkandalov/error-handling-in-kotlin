@@ -68,7 +68,7 @@ class WebApp(val gameStore: GameStore) {
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =
         try {
             val gameId = connectRequest.parseGameId()
-            val _ = gameStore.findGame(gameId)
+            gameStore.findGame(gameId)
             SseResponse { sse ->
                 val subscribers = subscribersByGame.getOrPut(gameId) { ConcurrentHashMap.newKeySet() }
                 subscribers.add(sse)

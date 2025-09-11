@@ -68,7 +68,7 @@ abstract class GameStoreTests(private val store: GameStore) {
 
     @Test fun `can't make move in non-existent game`() {
         assertFailsWith<GameNotFound> {
-            val _ = store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user"))
+            store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user"))
         }
     }
 }
