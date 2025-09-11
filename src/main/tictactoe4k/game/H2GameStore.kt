@@ -1,14 +1,7 @@
 package tictactoe4k.game
 
-import java.util.*
-
-class H2GameStore(
-    private val jdbcUrl: String,
-    private val generateId: () -> String = { UUID.randomUUID().toString() },
-) : GameStore, AutoCloseable {
-    fun init() = apply {
-        TODO()
-    }
+class H2GameStore(private val jdbcUrl: String) : GameStore, AutoCloseable {
+    fun init() = apply { TODO() }
 
     override fun newGame() = TODO()
 
