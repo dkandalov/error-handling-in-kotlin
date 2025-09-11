@@ -37,7 +37,7 @@ class ConfigTests {
 
     @Test fun `invalid port`() {
         assertThrows<NumberFormatException> {
-            Config(mapOf("PORT" to "eighty-eighty"))
+            Config(mapOf("PORT" to "not-a-number"))
         }
     }
 
