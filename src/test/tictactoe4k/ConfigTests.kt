@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
-import strikt.assertions.isFalse
 
 class ConfigTests {
     @Test fun `defaults when map is empty`() {
@@ -42,7 +41,9 @@ class ConfigTests {
     }
 
     @Test fun `invalid useInMemoryStore`() {
-        expectThat(Config(mapOf("IN_MEMORY_STORE" to "not-a-boolean")).useInMemoryStore).isFalse()
+        assertThrows<IllegalArgumentException> {
+            Config(mapOf("IN_MEMORY_STORE" to "not-a-boolean"))
+        }
     }
 
     @Test fun `invalid h2JdbcUrl`() {
