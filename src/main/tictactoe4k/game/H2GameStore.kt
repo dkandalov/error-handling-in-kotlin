@@ -123,7 +123,7 @@ class H2GameStore(
                 val assignedPlayer = when (count) {
                     0 -> Player.X
                     1 -> Player.O
-                    else -> throw GameException("Cannot make the move. There are already two players.")
+                    else -> throw CannotAddNewPlayer(id)
                 }
                 val _ = connection.prepareStatement(
                     "insert into game_users(game_id, user_id, player) values (?, ?, ?)"

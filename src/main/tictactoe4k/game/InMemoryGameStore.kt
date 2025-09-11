@@ -25,7 +25,7 @@ class InMemoryGameStore(
         val player = Player.entries
             .firstOrNull { players[it] == null || players[it] == userId }
             ?.also { players[it] = userId }
-            ?: throw GameException("Cannot make the move. There are already two players.")
+            ?: throw CannotAddNewPlayer(id)
 
         val updatedGame = game.makeMove(Move(x, y, player))
         gamesById[id] = updatedGame

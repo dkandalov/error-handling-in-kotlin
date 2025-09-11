@@ -17,4 +17,6 @@ value class UserId(val value: String) {
     override fun toString() = value
 }
 
-data class GameNotFound(val id: GameId) : GameException("Game not found: $id")
+open class GameStoreException(message: String? = null) : Exception(message)
+data class GameNotFound(val id: GameId) : GameStoreException("Game not found: $id")
+data class CannotAddNewPlayer(val id: GameId) : GameStoreException("There are already two players: $id")
