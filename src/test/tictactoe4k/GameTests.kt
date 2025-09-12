@@ -16,9 +16,9 @@ import kotlin.test.fail
 class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
-            Game().makeMove_new(Move(0, 1, X)).orFail()
-                .makeMove_new(Move(2, 0, O)).orFail()
-                .makeMove_new(Move(2, 1, X)).orFail()
+            Game().makeMove(Move(0, 1, X)).orFail()
+                .makeMove(Move(2, 0, O)).orFail()
+                .makeMove(Move(2, 1, X)).orFail()
 
         expectThat(updatedGame.moves).isEqualTo(
             listOf(
@@ -54,38 +54,38 @@ class GameTests {
 
     @Test fun `can't make the same move twice`() {
         val game = Game()
-            .makeMove_new(Move(0, 0, X)).orFail()
-            .makeMove_new(Move(1, 1, O)).orFail()
+            .makeMove(Move(0, 0, X)).orFail()
+            .makeMove(Move(1, 1, O)).orFail()
 
-        assertFailsWith<DuplicateMove> { game.makeMove_new(Move(0, 0, X)).orThrow() }
+        assertFailsWith<DuplicateMove> { game.makeMove(Move(0, 0, X)).orThrow() }
     }
 
     @Test fun `can't make moves outside of the board`() {
         assertFailsWith<OutOfRangeMove> {
-            Game().makeMove_new(Move(-1, 0, X)).orThrow()
+            Game().makeMove(Move(-1, 0, X)).orThrow()
         }
         assertFailsWith<OutOfRangeMove> {
-            Game().makeMove_new(Move(0, 3, X)).orThrow()
+            Game().makeMove(Move(0, 3, X)).orThrow()
         }
     }
 
     @Test fun `can't make moves when the game is over`() {
         assertFailsWith<MoveAfterGameOver> {
-            Game().makeMoves(playerXWinningMoves).makeMove_new(Move(2, 2, X)).orThrow()
+            Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, X)).orThrow()
         }
     }
 
     @Test fun `can't make moves with wrong player`() {
         assertFailsWith<WrongPlayerMove> {
-            Game().makeMove_new(Move(0, 0, O)).orThrow()
+            Game().makeMove(Move(0, 0, O)).orThrow()
         }
         assertFailsWith<WrongPlayerMove> {
-            Game().makeMove_new(Move(0, 0, X)).orThrow().makeMove_new(Move(0, 1, X)).orThrow()
+            Game().makeMove(Move(0, 0, X)).orThrow().makeMove(Move(0, 1, X)).orThrow()
         }
     }
 
     private fun Game.makeMoves(moves: List<Move>) =
-        moves.fold(this) { game, move -> game.makeMove_new(move).orThrow() }
+        moves.fold(this) { game, move -> game.makeMove(move).orThrow() }
 }
 
 fun Result<Game, WrongPlayerMove>.orFail() =

@@ -28,7 +28,7 @@ class InMemoryGameStore(
             ?.also { players[it] = userId }
             ?: throw CannotAddNewPlayer(id)
 
-        val updatedGame = game.makeMove_new(Move(x, y, player)).orThrow()
+        val updatedGame = game.makeMove(Move(x, y, player)).orThrow()
         gamesById[id] = updatedGame
         return updatedGame
     }
