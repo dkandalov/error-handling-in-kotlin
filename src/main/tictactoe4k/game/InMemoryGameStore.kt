@@ -1,7 +1,7 @@
 package tictactoe4k.game
 
-import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.onFailure
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -29,12 +29,12 @@ class InMemoryGameStore(
             ?.also { players[it] = userId }
             ?: throw CannotAddNewPlayer(id)
 
-        val updatedGame = when (val result = game.makeMove(Move(x, y, player))) {
-            is Success<Game> -> result.value
-            is Failure<GameException> -> throw result.reason
-        }
-        gamesById[id] = updatedGame
-        return updatedGame
+        game.makeMove(Move(x, y, player))
+            .map { updatedGame ->
+                gamesById[id] = updatedGame
+                return updatedGame
+            }
+            .onFailure { throw it.reason }
     }
 
     override fun newUserId() =
