@@ -24,6 +24,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 class WebApp(val gameStore: GameStore) {
     private val htmlRenderer = HandlebarsTemplates().HotReload("src/main/resources")
+    private val subscribersByGame = ConcurrentHashMap<GameId, MutableSet<Sse>>()
+
     val httpHandler =
         routes(
             "/" bind GET to ::newGame,
@@ -33,8 +35,8 @@ class WebApp(val gameStore: GameStore) {
         ).withFilter(HandleUnexpectedExceptions(htmlRenderer))
             .withFilter(UserIdCookieFilter(gameStore))
 
-    private val subscribersByGame = ConcurrentHashMap<GameId, MutableSet<Sse>>()
-    val sseHandler = sse("/game/{gameId}/events" bind ::subscribeToGameEvents)
+    val sseHandler =
+        sse("/game/{gameId}/events" bind ::subscribeToGameEvents)
 
     private fun newGame(request: Request): Response {
         val gameId = gameStore.newGame()
