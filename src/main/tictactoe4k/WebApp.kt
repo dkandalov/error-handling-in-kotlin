@@ -1,8 +1,7 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.recover
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -77,7 +76,7 @@ class WebApp(val gameStore: GameStore) {
                 subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
                 Response(SEE_OTHER).header("Location", "/game/$gameId")
             }
-            .mapFailure {
+            .recover {
                 when (it) {
                     is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
                     is CannotAddNewPlayer,
@@ -88,7 +87,6 @@ class WebApp(val gameStore: GameStore) {
                         -> throw it
                 }
             }
-            .get()
     }
 
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =
