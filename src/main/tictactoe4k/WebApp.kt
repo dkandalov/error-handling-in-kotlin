@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
+import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.html
 import org.http4k.lens.string
@@ -39,6 +40,7 @@ class WebApp(val gameStore: GameStore) {
             "/game/{gameId}/move" bind GET to ::makeMove,
             "/static" bind static(Classpath("public"))
         ).withFilter(HandleUnexpectedExceptions(htmlRenderer))
+            .withFilter(CatchLensFailure())
             .withFilter(UserIdCookieFilter(gameStore))
 
     val sseHandler =
