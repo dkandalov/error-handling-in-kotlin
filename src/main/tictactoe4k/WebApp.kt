@@ -12,6 +12,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.lens.html
 import org.http4k.routing.*
+import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
@@ -31,7 +32,7 @@ class WebApp(val gameStore: GameStore) {
             "/" bind GET to ::newGame,
             "/game/{gameId}" bind GET to ::findGame,
             "/game/{gameId}/move" bind GET to ::makeMove,
-            "/static" bind static(ResourceLoader.Classpath("public"))
+            "/static" bind static(Classpath("public"))
         ).withFilter(HandleUnexpectedExceptions(htmlRenderer))
             .withFilter(UserIdCookieFilter(gameStore))
 
