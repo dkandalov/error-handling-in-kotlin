@@ -1,5 +1,6 @@
 package tictactoe4k.game
 
+import dev.forkhandles.result4k.orThrow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -27,7 +28,7 @@ class InMemoryGameStore(
             ?.also { players[it] = userId }
             ?: throw CannotAddNewPlayer(id)
 
-        val updatedGame = game.makeMove(Move(x, y, player))
+        val updatedGame = game.makeMove_new(Move(x, y, player)).orThrow()
         gamesById[id] = updatedGame
         return updatedGame
     }
