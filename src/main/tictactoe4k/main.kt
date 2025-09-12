@@ -6,16 +6,30 @@ import org.http4k.server.Jetty11
 import org.http4k.server.asServer
 import tictactoe4k.game.H2GameStore
 import tictactoe4k.game.InMemoryGameStore
+import java.util.concurrent.CopyOnWriteArrayList
 
 fun main() {
+    val closables = CompositeClosable().closeOnShutdown()
     val config = Config()
     val gameStore =
         if (config.useInMemoryStore) InMemoryGameStore()
-        else H2GameStore(config.jdbcUrl).init()
+        else H2GameStore(config.jdbcUrl).init().also(closables::add)
 
-    WebApp(gameStore).startOn(config.port)
+    WebApp(gameStore).startOn(config.port).also(closables::add)
 
     println("Started web server on http://localhost:${config.port}")
+}
+
+class CompositeClosable(private val closables: MutableList<AutoCloseable> = CopyOnWriteArrayList()) : AutoCloseable {
+    fun add(closable: AutoCloseable) =
+        closables.add(closable)
+
+    override fun close() =
+        closables.reversed().forEach { it.close() }
+
+    fun closeOnShutdown() = apply {
+        Runtime.getRuntime().addShutdownHook(Thread(this::close))
+    }
 }
 
 private fun WebApp.startOn(port: Port): Http4kServer =
