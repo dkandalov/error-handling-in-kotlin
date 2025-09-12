@@ -15,11 +15,11 @@ class UserCookieTests {
 
     @Test fun `sets userid cookie when absent`() {
         val response = webApp(Request(GET, "/foo"))
-        expectThat(response.cookies()).isEqualTo(listOf(Cookie("userid", "1", path = "/", httpOnly = true)))
+        expectThat(response.cookies()).isEqualTo(listOf(Cookie("userId", "1", path = "/", httpOnly = true)))
     }
 
     @Test fun `does not overwrite existing userid cookie`() {
-        val response = webApp(Request(GET, "/").cookie("userid", "123"))
+        val response = webApp(Request(GET, "/").cookie("userId", "123"))
         expectThat(response.cookies()).isEqualTo(emptyList())
     }
 }

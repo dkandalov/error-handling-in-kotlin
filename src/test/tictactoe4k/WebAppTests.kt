@@ -62,7 +62,7 @@ class WebAppTests {
 
     @Test fun `can't make moves after game is over`(approver: Approver) {
         gameStore.makeMoves(gameId, playerXWinningMoves)
-        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userid", "user-O")).expectOK())
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userId", "user-O")).expectOK())
     }
 
     @Test fun `third player joining the game can't make moves`(approver: Approver) {
@@ -77,8 +77,8 @@ class WebAppTests {
     }
 
     @Test fun `same player makes two moves in a row`(approver: Approver) {
-        http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userid", "user-O")).expectOK()
-        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=2&y=2").cookie("userid", "user-O")).expectOK())
+        http(Request(GET, "/game/$gameId/move?x=1&y=1").cookie("userId", "user-O")).expectOK()
+        approver.assertApproved(http(Request(GET, "/game/$gameId/move?x=2&y=2").cookie("userId", "user-O")).expectOK())
     }
 
     @Test fun `out of range moves`(approver: Approver) {
