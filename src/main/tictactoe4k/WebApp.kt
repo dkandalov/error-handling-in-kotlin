@@ -83,8 +83,7 @@ class WebApp(val gameStore: GameStore) {
                     is DuplicateMove,
                     is GameNotFound,
                     is MoveAfterGameOver,
-                    is OutOfRangeMove,
-                        -> throw it
+                    is OutOfRangeMove -> throw it
                 }
             }
     }
