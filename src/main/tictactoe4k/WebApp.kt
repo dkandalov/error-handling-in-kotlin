@@ -55,8 +55,8 @@ class WebApp(val gameStore: GameStore) {
 
     private fun makeMove(request: Request): Response {
         val gameId = request.parseGameId()
-        val x = request.query("x")!!.toInt()
-        val y = request.query("y")!!.toInt()
+        val x = request.parseX()
+        val y = request.parseY()
         val userId = UserId(request.cookie("userid")!!.value)
 
         try {
@@ -92,10 +92,16 @@ class WebApp(val gameStore: GameStore) {
             }
         }
     }
-}
 
-private fun Request.parseGameId() =
-    path("gameId")!!.let(::GameId)
+    private fun Request.parseGameId() =
+        path("gameId")!!.let(::GameId)
+
+    private fun Request.parseX() =
+        query("x")!!.toInt()
+
+    private fun Request.parseY() =
+        query("y")!!.toInt()
+}
 
 private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRenderer) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
