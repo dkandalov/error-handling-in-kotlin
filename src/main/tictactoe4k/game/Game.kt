@@ -41,7 +41,7 @@ data class Move(
 
 enum class Player { X, O }
 
-open class GameException(message: String? = null) : Exception(message)
+sealed class GameException(message: String? = null) : Exception(message)
 data class MoveAfterGameOver(val move: Move) : GameException("Can't move after the game is over: $move")
 data class OutOfRangeMove(val move: Move) : GameException("Move out of range: $move")
 data class DuplicateMove(val move: Move) : GameException("Duplicate move: $move")
