@@ -59,7 +59,6 @@ abstract class GameStoreTests(private val store: GameStore) {
             .isEqualTo(Game(listOf(Move(1, 1, X))))
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't find non-existent game`() {
         assertFailsWith<GameNotFound> {
             store.findGame(GameId("non-existent-id"))

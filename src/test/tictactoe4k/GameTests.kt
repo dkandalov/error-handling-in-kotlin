@@ -49,7 +49,6 @@ class GameTests {
         expectThat(game.nextPlayer).isEqualTo(null)
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make the same move twice`() {
         val game = Game()
             .makeMove(Move(0, 0, X))
@@ -58,7 +57,6 @@ class GameTests {
         assertFailsWith<DuplicateMove> { game.makeMove(Move(0, 0, X)) }
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves outside of the board`() {
         assertFailsWith<OutOfRangeMove> {
             Game().makeMove(Move(-1, 0, X))
@@ -68,14 +66,12 @@ class GameTests {
         }
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves when the game is over`() {
         assertFailsWith<MoveAfterGameOver> {
             Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, X))
         }
     }
 
-    @Suppress("RETURN_VALUE_NOT_USED")
     @Test fun `can't make moves with wrong player`() {
         assertFailsWith<WrongPlayerMove> {
             Game().makeMove(Move(0, 0, O))
