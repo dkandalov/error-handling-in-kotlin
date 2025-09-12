@@ -77,16 +77,20 @@ class WebApp(val gameStore: GameStore) {
                 Response(SEE_OTHER).header("Location", "/game/$gameId")
             }
             .recover {
-                when (it) {
-                    is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
-                    is CannotAddNewPlayer,
-                    is DuplicateMove,
-                    is GameNotFound,
-                    is MoveAfterGameOver,
-                    is OutOfRangeMove -> throw it
-                }
+                it.toResponse(gameId)
             }
     }
+
+    private fun GameException.toResponse(gameId: GameId): Response =
+        when (this) {
+            is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
+            is CannotAddNewPlayer,
+            is DuplicateMove,
+            is GameNotFound,
+            is MoveAfterGameOver,
+            is OutOfRangeMove,
+                -> throw this
+        }
 
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =
         try {
