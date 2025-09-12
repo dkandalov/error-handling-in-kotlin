@@ -114,9 +114,6 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
     }
 }
 
-private fun Request.userId() =
-    cookie("userId")?.value?.let(::UserId)
-
 private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
         val userId = request.userId()
@@ -128,3 +125,6 @@ private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
         }
     }
 }
+
+private fun Request.userId() =
+    cookie("userId")?.value?.let(::UserId)
