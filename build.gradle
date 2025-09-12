@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "2.2.255-SNAPSHOT"
+    id "org.jetbrains.kotlin.jvm" version "2.2.20"
 }
 
 group "tictactoe4k"
