@@ -30,7 +30,7 @@ class WebApp(val gameStore: GameStore) {
     val httpHandler =
         routes(
             "/" bind GET to ::newGame,
-            "/game/{gameId}" bind GET to ::findGame,
+            "/game/{gameId}" bind GET to ::viewGame,
             "/game/{gameId}/move" bind GET to ::makeMove,
             "/static" bind static(Classpath("public"))
         ).withFilter(HandleUnexpectedExceptions(htmlRenderer))
@@ -50,7 +50,7 @@ class WebApp(val gameStore: GameStore) {
         return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
-    private fun findGame(request: Request): Response {
+    private fun viewGame(request: Request): Response {
         val gameId = request.parseGameId()
         val game = gameStore.findGame(gameId)
         return Response(OK).html(htmlRenderer(GameView(game, gameId)))
