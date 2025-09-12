@@ -8,6 +8,7 @@ interface GameStore {
     fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game
     fun newUserId(): UserId
     fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException>
+    fun findGame_new(id: GameId): Result<Game, GameNotFound>
 }
 
 @JvmInline
