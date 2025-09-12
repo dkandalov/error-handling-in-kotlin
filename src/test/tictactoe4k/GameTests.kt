@@ -88,7 +88,7 @@ class GameTests {
         moves.fold(this) { game, move -> game.makeMove(move).orThrow() }
 }
 
-fun Result<Game, WrongPlayerMove>.orFail() =
+fun Result<Game, GameException>.orFail() =
     orThrow { fail("Expected Successful but was $this") }
 
 val playerXWinningMoves = listOf(
