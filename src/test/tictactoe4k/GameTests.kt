@@ -1,5 +1,6 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.orThrow
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -10,11 +11,12 @@ import tictactoe4k.game.*
 import tictactoe4k.game.Player.O
 import tictactoe4k.game.Player.X
 import kotlin.test.assertFailsWith
+import kotlin.test.fail
 
 class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
-            Game().makeMove_new(Move(0, 1, X)).orThrow()
+            Game().makeMove_new(Move(0, 1, X)).orFail()
                 .makeMove_new(Move(2, 0, O)).orThrow()
                 .makeMove_new(Move(2, 1, X)).orThrow()
 
@@ -85,6 +87,9 @@ class GameTests {
     private fun Game.makeMoves(moves: List<Move>) =
         moves.fold(this) { game, move -> game.makeMove_new(move).orThrow() }
 }
+
+fun Result<Game, WrongPlayerMove>.orFail() =
+    orThrow { fail("Expected Successful but was $this") }
 
 val playerXWinningMoves = listOf(
     Move(0, 0, X), Move(1, 0, O),
