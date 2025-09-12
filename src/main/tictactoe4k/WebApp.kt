@@ -57,7 +57,7 @@ class WebApp(val gameStore: GameStore) {
         val gameId = request.parseGameId()
         val x = request.parseX()
         val y = request.parseY()
-        val userId = UserId(request.cookie("userId")!!.value)
+        val userId = request.userId()!!
 
         try {
             gameStore.makeMove(gameId, x, y, userId)
@@ -114,9 +114,12 @@ private class HandleUnexpectedExceptions(private val htmlRenderer: TemplateRende
     }
 }
 
+private fun Request.userId() =
+    cookie("userId")?.value?.let(::UserId)
+
 private class UserIdCookieFilter(private val gameStore: GameStore) : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
-        val userId = request.cookie("userId")?.let { UserId(it.value) }
+        val userId = request.userId()
         if (userId != null) next(request)
         else {
             val newUserId = gameStore.newUserId()
