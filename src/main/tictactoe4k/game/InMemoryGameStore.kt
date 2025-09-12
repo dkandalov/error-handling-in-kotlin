@@ -20,7 +20,7 @@ class InMemoryGameStore(
         findGame_new(id).orThrow()
 
     override fun findGame_new(id: GameId): Result<Game, GameNotFound> =
-        gamesById[id]?.asSuccess() ?: GameNotFound(id).asFailure()
+        gamesById[id].asResultOr { GameNotFound(id) }
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId) =
         makeMove_new(id, x, y, userId).orThrow()
