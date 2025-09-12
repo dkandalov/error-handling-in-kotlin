@@ -27,14 +27,14 @@ class InMemoryGameStore(
 
     override fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException> {
         return findGame_new(id)
-            .map { game ->
+            .flatMap { game ->
                 val players = playersByGame.getOrPut(id) { ConcurrentHashMap() }
                 val player = Player.entries
                     .firstOrNull { players[it] == null || players[it] == userId }
                     ?.also { players[it] = userId }
                     ?: return CannotAddNewPlayer(id).asFailure()
 
-                return game.makeMove(Move(x, y, player))
+                game.makeMove(Move(x, y, player))
                     .map { updatedGame ->
                         gamesById[id] = updatedGame
                         updatedGame
