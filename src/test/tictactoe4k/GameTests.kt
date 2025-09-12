@@ -17,8 +17,8 @@ class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
             Game().makeMove_new(Move(0, 1, X)).orFail()
-                .makeMove_new(Move(2, 0, O)).orThrow()
-                .makeMove_new(Move(2, 1, X)).orThrow()
+                .makeMove_new(Move(2, 0, O)).orFail()
+                .makeMove_new(Move(2, 1, X)).orFail()
 
         expectThat(updatedGame.moves).isEqualTo(
             listOf(
@@ -54,8 +54,8 @@ class GameTests {
 
     @Test fun `can't make the same move twice`() {
         val game = Game()
-            .makeMove_new(Move(0, 0, X)).orThrow()
-            .makeMove_new(Move(1, 1, O)).orThrow()
+            .makeMove_new(Move(0, 0, X)).orFail()
+            .makeMove_new(Move(1, 1, O)).orFail()
 
         assertFailsWith<DuplicateMove> { game.makeMove_new(Move(0, 0, X)).orThrow() }
     }
