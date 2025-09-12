@@ -18,19 +18,26 @@ fun main() {
     println("Started web server on http://localhost:${config.port}")
 }
 
-private fun WebApp.startOn(port: Int): Http4kServer =
+private fun WebApp.startOn(port: Port): Http4kServer =
     poly(httpHandler, sseHandler)
-        .asServer(Jetty11(port))
+        .asServer(Jetty11(port.value))
         .start()
 
 data class Config(
-    val port: Int,
+    val port: Port,
     val useInMemoryStore: Boolean,
     val jdbcUrl: String,
 ) {
     constructor(map: Map<String, String> = System.getenv()) : this(
-        port = map["PORT"]?.toInt() ?: 8080,
+        port = map["PORT"]?.toInt()?.let(::Port) ?: Port(8080),
         useInMemoryStore = map["IN_MEMORY_STORE"]?.toBoolean() ?: true,
         jdbcUrl = map["JDBC_DATABASE_URL"] ?: "jdbc:h2:file:./data",
     )
+}
+
+@JvmInline
+value class Port(val value: Int) {
+    init {
+        require(value in 0..65535)
+    }
 }

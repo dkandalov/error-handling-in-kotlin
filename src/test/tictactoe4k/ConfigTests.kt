@@ -9,7 +9,7 @@ class ConfigTests {
     @Test fun `defaults when map is empty`() {
         expectThat(Config(emptyMap())).isEqualTo(
             Config(
-                port = 8080,
+                port = Port(8080),
                 useInMemoryStore = true,
                 jdbcUrl = "jdbc:h2:file:./data",
             )
@@ -27,7 +27,7 @@ class ConfigTests {
             )
         ).isEqualTo(
             Config(
-                port = 1234,
+                port = Port(1234),
                 useInMemoryStore = true,
                 jdbcUrl = "jdbc:h2:mem:testdb",
             )
