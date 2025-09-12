@@ -31,6 +31,7 @@ kotlin.sourceSets {
     test.kotlin.srcDirs += "src/test"
 }
 
+// https://github.com/Kotlin/KEEP/blob/main/proposals/KEEP-0412-unused-return-value-checker.md
 //kotlin.compilerOptions.freeCompilerArgs.add("-Xreturn-value-checker=full")
 
 kotlin {
