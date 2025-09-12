@@ -43,7 +43,7 @@ data class Config(
     val jdbcUrl: String,
 ) {
     constructor(map: Map<String, String> = System.getenv()) : this(
-        port = map["PORT"]?.toInt()?.let(::Port) ?: Port(8080),
+        port = map["PORT"]?.toIntOrNull()?.let(::Port) ?: Port(8080),
         useInMemoryStore = map["IN_MEMORY_STORE"]?.toBoolean() ?: true,
         jdbcUrl = map["JDBC_DATABASE_URL"] ?: "jdbc:h2:file:./data",
     )

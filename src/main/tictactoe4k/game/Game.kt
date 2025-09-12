@@ -11,13 +11,13 @@ data class Game(val moves: List<Move> = emptyList()) {
     val isOver = winner != null || moves.size == 9
     val nextPlayer = if (isOver) null else if (moves.lastOrNull()?.player == X) O else X
 
-    fun makeMove(move: Move): Result<Game, GameException> {
-        if (isOver) return MoveAfterGameOver(move).asFailure()
-        if (move.x !in 0..2 || move.y !in 0..2) return OutOfRangeMove(move).asFailure()
-        if (moves.any { it.x == move.x && it.y == move.y }) return DuplicateMove(move).asFailure()
-        if (move.player != nextPlayer) return WrongPlayerMove(move.player).asFailure()
+    fun makeMove(move: Move): Game | GameException {
+        if (isOver) return MoveAfterGameOver(move)
+        if (move.x !in 0..2 || move.y !in 0..2) return OutOfRangeMove(move)
+        if (moves.any { it.x == move.x && it.y == move.y }) return DuplicateMove(move)
+        if (move.player != nextPlayer) return WrongPlayerMove(move.player)
 
-        return Game(moves + move).asSuccess()
+        return Game(moves + move)
     }
 
     private fun findWinner(): Player? =
@@ -41,8 +41,9 @@ data class Move(
 
 enum class Player { X, O }
 
-sealed class GameException(message: String? = null) : Exception(message)
-data class MoveAfterGameOver(val move: Move) : GameException("Can't move after the game is over: $move")
-data class OutOfRangeMove(val move: Move) : GameException("Move out of range: $move")
-data class DuplicateMove(val move: Move) : GameException("Duplicate move: $move")
-data class WrongPlayerMove(val player: Player) : GameException("It's not $player's turn")
+typealias GameException = MoveAfterGameOver | OutOfRangeMove | DuplicateMove | WrongPlayerMove
+
+error class MoveAfterGameOver(val move: Move)
+error class OutOfRangeMove(val move: Move)
+error class DuplicateMove(val move: Move)
+error class WrongPlayerMove(val player: Player)
