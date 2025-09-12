@@ -10,10 +10,15 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
+import org.http4k.lens.Path
 import org.http4k.lens.html
-import org.http4k.routing.*
+import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.bind
+import org.http4k.routing.routes
+import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
+import org.http4k.routing.static
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
@@ -97,7 +102,9 @@ class WebApp(val gameStore: GameStore) {
     }
 
     private fun Request.parseGameId() =
-        path("gameId")!!.let(::GameId)
+        gameIdLens.extract(this).let(::GameId)
+
+    private val gameIdLens = Path.string().of("gameId")
 
     private fun Request.parseX() =
         query("x")!!.toInt()
