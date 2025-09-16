@@ -1,6 +1,6 @@
 ![CI](https://github.com/dkandalov/error-handling-in-kotlin/workflows/CI/badge.svg)
 
-This project contains source code for the [Error handling in Kotlin (and beyond) talk](https://jaxlondon.com/java-core-jvm-languages/error-handling-in-kotlin-and-beyond).
+This project contains source code for the [Error handling in Kotlin (and beyond) talk](https://ktconf.be/speakers/dmitry-kandalov).
 
 Links and technologies mentioned in the talk:
  - [test && commit || revert](https://medium.com/@kentbeck_7670/test-commit-revert-870bbd756864), [Limited WIP plugin](https://plugins.jetbrains.com/plugin/7655-limited-wip) for IntelliJ
