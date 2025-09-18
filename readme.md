@@ -9,8 +9,9 @@ Project setup:
  - [Kotlin 2.2.20](https://blog.jetbrains.com/kotlin/2025/09/kotlin-2-2-20-released/)
 
 Links and technologies mentioned in the talk:
- - [Error Handling Strategies for Kotlin Programs](https://www.youtube.com/watch?v=pvYAQNT4o0I)
- - [Rich Errors in Kotlin](https://www.youtube.com/watch?v=IUrA3mDSWZQ)
+ - [Error Handling Strategies for Kotlin Programs by Nat Pryce & Duncan McGregor](https://www.youtube.com/watch?v=pvYAQNT4o0I)
+ - [Rich Errors in Kotlin | Michail Zarečenskij](https://www.youtube.com/watch?v=IUrA3mDSWZQ)
+ - [Revamping and Extending Kotlin's Type System | Ross Tate](https://www.youtube.com/watch?v=3uNpmhHwkuQ)
  - [Tic-tac-toe (aka noughts and crosses)](https://en.wikipedia.org/wiki/Tic-tac-toe)
  - [Effective Java third edition](https://www.oreilly.com/library/view/effective-java/9780134686097) (see chapter 10)
  - [Null safety in Kotlin](https://kotlinlang.org/docs/null-safety.html), [A Whirlwind Tour of the Kotlin Type Hierarchy](http://natpryce.com/articles/000818.html)
