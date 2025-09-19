@@ -12,12 +12,12 @@ interface GameStore {
 
 interface Presenter {
     fun success(game: Game)
-    fun failure(gameId: GameId)
+    fun failure(gameException: GameException)
 }
 
 val noopPresenter = object : Presenter {
     override fun success(game: Game) {}
-    override fun failure(gameId: GameId) {}
+    override fun failure(gameException: GameException) {}
 }
 
 @JvmInline
