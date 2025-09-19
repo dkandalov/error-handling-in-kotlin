@@ -35,23 +35,6 @@ class InMemoryGameStore(
 
         gamesById[id] = updatedGame
         return updatedGame.asSuccess()
-
-        return findGame_new(id)
-            .flatMap { game ->
-                val players = playersByGame.getOrPut(id) { ConcurrentHashMap() }
-                val player = Player.entries
-                    .firstOrNull { players[it] == null || players[it] == userId }
-                    ?.also { players[it] = userId }
-                    .asResultOr { CannotAddNewPlayer(id) }
-
-                player.flatMap {
-                    game.makeMove(Move(x, y, it))
-                }
-            }
-            .map { updatedGame ->
-                gamesById[id] = updatedGame
-                updatedGame
-            }
     }
 
     override fun newUserId() =
