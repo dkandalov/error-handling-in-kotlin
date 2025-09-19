@@ -29,9 +29,11 @@ class InMemoryGameStore(
                 val player = Player.entries
                     .firstOrNull { players[it] == null || players[it] == userId }
                     ?.also { players[it] = userId }
-                    ?: return CannotAddNewPlayer(id).asFailure()
+                    .asResultOr { CannotAddNewPlayer(id) }
 
-                game.makeMove(Move(x, y, player))
+                player.flatMap {
+                    game.makeMove(Move(x, y, it))
+                }
             }
             .map { updatedGame ->
                 gamesById[id] = updatedGame
