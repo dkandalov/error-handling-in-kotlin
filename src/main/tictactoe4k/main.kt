@@ -34,3 +34,11 @@ data class Config(
         jdbcUrl = map["JDBC_DATABASE_URL"] ?: "jdbc:h2:file:./data",
     )
 }
+
+
+
+
+
+
+
+
