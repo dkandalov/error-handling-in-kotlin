@@ -15,7 +15,9 @@ fun main() {
         if (config.useInMemoryStore) InMemoryGameStore()
         else H2GameStore(config.jdbcUrl).init().also(closable::add)
 
-    WebApp(gameStore).startOn(config.port).also(closable::add)
+    WebApp(gameStore)
+        .startOn(config.port)
+        .also(closable::add)
 
     println("Started web server on http://localhost:${config.port}")
 }
