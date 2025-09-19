@@ -78,7 +78,11 @@ class WebApp(val gameStore: GameStore) {
             .recover {
                 when (it) {
                     is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
-                    else -> throw it
+                    is CannotAddNewPlayer,
+                    is DuplicateMove,
+                    is GameNotFound,
+                    is MoveAfterGameOver,
+                    is OutOfRangeMove -> throw it
                 }
             }
     }
