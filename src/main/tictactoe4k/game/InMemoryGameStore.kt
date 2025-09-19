@@ -1,8 +1,6 @@
 package tictactoe4k.game
 
-import dev.forkhandles.result4k.Result
-import dev.forkhandles.result4k.asFailure
-import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -19,7 +17,10 @@ class InMemoryGameStore(
     }
 
     override fun findGame(id: GameId): Game =
-        gamesById[id] ?: throw GameNotFound(id)
+        findGame_new(id).orThrow()
+
+    override fun findGame_new(id: GameId): Result<Game, GameNotFound> =
+        gamesById[id]?.asSuccess() ?: GameNotFound(id).asFailure()
 
     override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException> {
         val game = findGame(id)

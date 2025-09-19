@@ -18,6 +18,10 @@ class H2GameStore(private val jdbcUrl: String) : GameStore, AutoCloseable {
         TODO("Not yet implemented")
     }
 
+    override fun findGame_new(id: GameId): Result<Game?, GameNotFound> {
+        TODO("Not yet implemented")
+    }
+
     override fun newUserId() = TODO()
 
     override fun close() = TODO()
