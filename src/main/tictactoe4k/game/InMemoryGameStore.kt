@@ -21,7 +21,7 @@ class InMemoryGameStore(
     override fun findGame(id: GameId): Game =
         gamesById[id] ?: throw GameNotFound(id)
 
-    override fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, WrongPlayerMove> {
+    override fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException> {
         val game = findGame(id)
 
         val players = playersByGame.getOrPut(id) { ConcurrentHashMap() }

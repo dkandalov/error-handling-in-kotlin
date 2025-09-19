@@ -6,7 +6,7 @@ interface GameStore {
     fun newGame(): GameId
     fun findGame(id: GameId): Game
     fun newUserId(): UserId
-    fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, WrongPlayerMove>
+    fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException>
 }
 
 @JvmInline
