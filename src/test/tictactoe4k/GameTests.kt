@@ -1,5 +1,6 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.orThrow
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -13,9 +14,9 @@ import kotlin.test.assertFailsWith
 class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
-            Game().makeMove(Move(0, 1, X))
-                .makeMove(Move(2, 0, O))
-                .makeMove(Move(2, 1, X))
+            Game().makeMove(Move(0, 1, X)).orThrow()
+                .makeMove(Move(2, 0, O)).orThrow()
+                .makeMove(Move(2, 1, X)).orThrow()
 
         expectThat(updatedGame.moves).isEqualTo(
             listOf(
@@ -51,38 +52,38 @@ class GameTests {
 
     @Test fun `can't make the same move twice`() {
         val game = Game()
-            .makeMove(Move(0, 0, X))
-            .makeMove(Move(1, 1, O))
+            .makeMove(Move(0, 0, X)).orThrow()
+            .makeMove(Move(1, 1, O)).orThrow()
 
-        assertFailsWith<DuplicateMove> { game.makeMove(Move(0, 0, X)) }
+        assertFailsWith<DuplicateMove> { game.makeMove(Move(0, 0, X)).orThrow() }
     }
 
     @Test fun `can't make moves outside of the board`() {
         assertFailsWith<OutOfRangeMove> {
-            Game().makeMove(Move(-1, 0, X))
+            Game().makeMove(Move(-1, 0, X)).orThrow()
         }
         assertFailsWith<OutOfRangeMove> {
-            Game().makeMove(Move(0, 3, X))
+            Game().makeMove(Move(0, 3, X)).orThrow()
         }
     }
 
     @Test fun `can't make moves when the game is over`() {
         assertFailsWith<MoveAfterGameOver> {
-            Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, X))
+            Game().makeMoves(playerXWinningMoves).makeMove(Move(2, 2, X)).orThrow()
         }
     }
 
     @Test fun `can't make moves with wrong player`() {
         assertFailsWith<WrongPlayerMove> {
-            Game().makeMove(Move(0, 0, O))
+            Game().makeMove(Move(0, 0, O)).orThrow()
         }
         assertFailsWith<WrongPlayerMove> {
-            Game().makeMove(Move(0, 0, X)).makeMove(Move(0, 1, X))
+            Game().makeMove(Move(0, 0, X)).orThrow().makeMove(Move(0, 1, X)).orThrow()
         }
     }
 
     private fun Game.makeMoves(moves: List<Move>) =
-        moves.fold(this, Game::makeMove)
+        moves.fold(this) { game, move -> game.makeMove(move).orThrow() }
 }
 
 val playerXWinningMoves = listOf(
