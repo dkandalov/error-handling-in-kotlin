@@ -90,10 +90,10 @@ class GameTests {
         moves.fold(this) { game, move -> game.makeMove(move).orThrow() }
 }
 
-private fun Result<Game, WrongPlayerMove>.orFail() =
+private fun Result<Game, GameException>.orFail() =
     when (this) {
         is Success<Game> -> value
-        is Failure<WrongPlayerMove> -> fail("Failed")
+        is Failure<*> -> fail("Failed")
     }
 
 val playerXWinningMoves = listOf(
