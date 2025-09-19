@@ -1,5 +1,8 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.orThrow
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -10,13 +13,14 @@ import tictactoe4k.game.*
 import tictactoe4k.game.Player.O
 import tictactoe4k.game.Player.X
 import kotlin.test.assertFailsWith
+import kotlin.test.fail
 
 class GameTests {
     @Test fun `players take turns on each move`() {
         val updatedGame =
-            Game().makeMove(Move(0, 1, X)).orThrow()
-                .makeMove(Move(2, 0, O)).orThrow()
-                .makeMove(Move(2, 1, X)).orThrow()
+            Game().makeMove(Move(0, 1, X)).orFail()
+                .makeMove(Move(2, 0, O)).orFail()
+                .makeMove(Move(2, 1, X)).orFail()
 
         expectThat(updatedGame.moves).isEqualTo(
             listOf(
@@ -52,8 +56,8 @@ class GameTests {
 
     @Test fun `can't make the same move twice`() {
         val game = Game()
-            .makeMove(Move(0, 0, X)).orThrow()
-            .makeMove(Move(1, 1, O)).orThrow()
+            .makeMove(Move(0, 0, X)).orFail()
+            .makeMove(Move(1, 1, O)).orFail()
 
         assertFailsWith<DuplicateMove> { game.makeMove(Move(0, 0, X)).orThrow() }
     }
@@ -85,6 +89,12 @@ class GameTests {
     private fun Game.makeMoves(moves: List<Move>) =
         moves.fold(this) { game, move -> game.makeMove(move).orThrow() }
 }
+
+private fun Result<Game, WrongPlayerMove>.orFail() =
+    when (this) {
+        is Success<Game> -> value
+        is Failure<WrongPlayerMove> -> fail("Failed")
+    }
 
 val playerXWinningMoves = listOf(
     Move(0, 0, X), Move(1, 0, O),
