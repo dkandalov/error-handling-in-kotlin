@@ -16,7 +16,7 @@ interface Presenter {
 }
 
 val noopPresenter = object : Presenter {
-    override fun success(game: Game) = TODO("Not yet implemented")
+    override fun success(game: Game) {}
     override fun failure(gameId: GameId) {}
 }
 
