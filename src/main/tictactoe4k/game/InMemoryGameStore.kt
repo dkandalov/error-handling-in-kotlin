@@ -6,6 +6,9 @@ import dev.forkhandles.result4k.orThrow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
+fun GameStore.makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game =
+    makeMove_new(id, x, y, userId).orThrow()
+
 class InMemoryGameStore(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
     private val generateId: () -> String = { UUID.randomUUID().toString() },
@@ -20,9 +23,6 @@ class InMemoryGameStore(
 
     override fun findGame(id: GameId): Game =
         gamesById[id] ?: throw GameNotFound(id)
-
-    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game =
-        makeMove_new(id, x, y, userId).orThrow()
 
     override fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, WrongPlayerMove> {
         val game = findGame(id)
