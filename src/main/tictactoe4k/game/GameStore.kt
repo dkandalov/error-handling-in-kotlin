@@ -6,8 +6,18 @@ interface GameStore {
     fun newGame(): GameId
     fun findGame(id: GameId): Game
     fun newUserId(): UserId
-    fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException>
+    fun makeMove(id: GameId, x: Int, y: Int, userId: UserId, presenter: Presenter = noopPresenter): Result<Game, GameException>
     fun findGame_new(id: GameId): Result<Game?, GameNotFound>
+}
+
+interface Presenter {
+    fun success(game: Game)
+    fun failure(game: Game)
+}
+
+val noopPresenter = object : Presenter {
+    override fun success(game: Game) = TODO("Not yet implemented")
+    override fun failure(game: Game) = TODO("Not yet implemented")
 }
 
 @JvmInline
