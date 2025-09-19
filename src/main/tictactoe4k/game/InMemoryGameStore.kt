@@ -32,10 +32,10 @@ class InMemoryGameStore(
                     ?: return CannotAddNewPlayer(id).asFailure()
 
                 game.makeMove(Move(x, y, player))
-                    .map { updatedGame ->
-                        gamesById[id] = updatedGame
-                        updatedGame
-                    }
+            }
+            .map { updatedGame ->
+                gamesById[id] = updatedGame
+                updatedGame
             }
     }
 
