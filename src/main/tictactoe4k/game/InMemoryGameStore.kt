@@ -2,7 +2,6 @@ package tictactoe4k.game
 
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.orThrow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,7 +20,7 @@ class InMemoryGameStore(
     override fun findGame(id: GameId): Game =
         gamesById[id] ?: throw GameNotFound(id)
 
-    override fun makeMove_new(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException> {
+    override fun makeMove(id: GameId, x: Int, y: Int, userId: UserId): Result<Game, GameException> {
         val game = findGame(id)
 
         val players = playersByGame.getOrPut(id) { ConcurrentHashMap() }

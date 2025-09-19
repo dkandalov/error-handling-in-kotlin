@@ -9,7 +9,7 @@ class H2GameStore(private val jdbcUrl: String) : GameStore, AutoCloseable {
 
     override fun findGame(id: GameId) = TODO()
 
-    override fun makeMove_new(
+    override fun makeMove(
         id: GameId,
         x: Int,
         y: Int,

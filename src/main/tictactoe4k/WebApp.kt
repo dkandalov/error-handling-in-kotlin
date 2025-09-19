@@ -70,7 +70,7 @@ class WebApp(val gameStore: GameStore) {
         val userId = request.userId()!!
 
         try {
-            gameStore.makeMove_new(gameId, x, y, userId).orThrow()
+            gameStore.makeMove(gameId, x, y, userId).orThrow()
         } catch (e: WrongPlayerMove) {
             return Response(SEE_OTHER).header("Location", "/game/$gameId")
         }

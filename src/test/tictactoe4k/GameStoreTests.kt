@@ -30,18 +30,18 @@ abstract class GameStoreTests(private val store: GameStore) {
     @Test fun `users take turns in the game`() {
         val id = store.newGame()
 
-        expectThat(store.makeMove_new(id, 0, 0, UserId("user-1")).orThrow())
+        expectThat(store.makeMove(id, 0, 0, UserId("user-1")).orThrow())
             .isEqualTo(Game(listOf(
                 Move(0, 0, X)
             )))
 
-        expectThat(store.makeMove_new(id, 1, 1, UserId("user-2")).orThrow())
+        expectThat(store.makeMove(id, 1, 1, UserId("user-2")).orThrow())
             .isEqualTo(Game(listOf(
                 Move(0, 0, X),
                 Move(1, 1, O)
             )))
 
-        expectThat(store.makeMove_new(id, 2, 2, UserId("user-1")).orThrow())
+        expectThat(store.makeMove(id, 2, 2, UserId("user-1")).orThrow())
             .isEqualTo(Game(listOf(
                 Move(0, 0, X),
                 Move(1, 1, O),
@@ -53,10 +53,10 @@ abstract class GameStoreTests(private val store: GameStore) {
         val id1 = store.newGame()
         val id2 = store.newGame()
 
-        expectThat(store.makeMove_new(id1, 0, 0, UserId("some-user")).orThrow())
+        expectThat(store.makeMove(id1, 0, 0, UserId("some-user")).orThrow())
             .isEqualTo(Game(listOf(Move(0, 0, X))))
 
-        expectThat(store.makeMove_new(id2, 1, 1, UserId("some-user")).orThrow())
+        expectThat(store.makeMove(id2, 1, 1, UserId("some-user")).orThrow())
             .isEqualTo(Game(listOf(Move(1, 1, X))))
     }
 
@@ -68,7 +68,7 @@ abstract class GameStoreTests(private val store: GameStore) {
 
     @Test fun `can't make move in non-existent game`() {
         assertFailsWith<GameNotFound> {
-            store.makeMove_new(GameId("non-existent-id"), 0, 0, UserId("some-user")).orThrow()
+            store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user")).orThrow()
         }
     }
 }
