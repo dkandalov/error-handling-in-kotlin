@@ -29,10 +29,10 @@ class InMemoryGameStore(
             ?.also { players[it] = userId }
             ?: throw CannotAddNewPlayer(id)
 
-        game.makeMove(Move(x, y, player))
+        return game.makeMove(Move(x, y, player))
             .map { updatedGame ->
                 gamesById[id] = updatedGame
-                return updatedGame
+                updatedGame
             }
             .orThrow()
     }
