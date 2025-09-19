@@ -71,22 +71,18 @@ class WebApp(val gameStore: GameStore) {
         val y = request.parseY()
         val userId = request.userId()!!
 
-        try {
-            return gameStore.makeMove(gameId, x, y, userId)
-                .map {
-                    subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
-                    Response(SEE_OTHER).header("Location", "/game/$gameId")
+        return gameStore.makeMove(gameId, x, y, userId)
+            .map {
+                subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
+                Response(SEE_OTHER).header("Location", "/game/$gameId")
+            }
+            .mapFailure {
+                when (it) {
+                    is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
+                    else -> throw it
                 }
-                .mapFailure {
-                    when (it) {
-                        is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
-                        else -> throw it
-                    }
-                }
-                .get()
-        } catch (e: WrongPlayerMove) {
-            return Response(SEE_OTHER).header("Location", "/game/$gameId")
-        }
+            }
+            .get()
     }
 
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =
