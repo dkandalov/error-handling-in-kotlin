@@ -1,6 +1,8 @@
 package tictactoe4k
 
-import dev.forkhandles.result4k.orThrow
+import dev.forkhandles.result4k.get
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -70,13 +72,21 @@ class WebApp(val gameStore: GameStore) {
         val userId = request.userId()!!
 
         try {
-            gameStore.makeMove(gameId, x, y, userId).orThrow()
+            return gameStore.makeMove(gameId, x, y, userId)
+                .map {
+                    subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
+                    Response(SEE_OTHER).header("Location", "/game/$gameId")
+                }
+                .mapFailure {
+                    when (it) {
+                        is WrongPlayerMove -> Response(SEE_OTHER).header("Location", "/game/$gameId")
+                        else -> throw it
+                    }
+                }
+                .get()
         } catch (e: WrongPlayerMove) {
             return Response(SEE_OTHER).header("Location", "/game/$gameId")
         }
-        subscribersByGame[gameId]?.broadcast(Event("update", gameId.value))
-
-        return Response(SEE_OTHER).header("Location", "/game/$gameId")
     }
 
     private fun subscribeToGameEvents(connectRequest: Request): SseResponse =
