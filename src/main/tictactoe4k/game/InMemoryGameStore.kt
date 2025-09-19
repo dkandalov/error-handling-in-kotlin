@@ -32,11 +32,20 @@ class InMemoryGameStore(
         val player = Player.entries
             .firstOrNull { players[it] == null || players[it] == userId }
             ?.also { players[it] = userId }
-            .asResultOr { CannotAddNewPlayer(id) }.onFailure { return it }
+            .asResultOr { CannotAddNewPlayer(id) }
+            .onFailure {
+                presenter.failure(id)
+                return it
+            }
 
-        val updatedGame = game.makeMove(Move(x, y, player)).onFailure { return it }
+        val updatedGame = game.makeMove(Move(x, y, player))
+            .onFailure {
+                presenter.failure(id)
+                return it
+            }
 
         gamesById[id] = updatedGame
+        presenter.success(updatedGame)
         return updatedGame.asSuccess()
     }
 
