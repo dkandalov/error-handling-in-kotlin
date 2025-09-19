@@ -1,5 +1,6 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.orThrow
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -132,7 +133,7 @@ class WebAppTests {
     private fun GameStore.makeMoves(id: GameId, moves: List<Move>) {
         val alternateUsers = generateSequence { sequenceOf(UserId("user-X"), UserId("user-O")) }.flatten()
         moves.asSequence().zip(alternateUsers).forEach { (move, user) ->
-            makeMove(id, move.x, move.y, user)
+            makeMove_new(id, move.x, move.y, user).orThrow<Game, WrongPlayerMove>()
         }
     }
 }

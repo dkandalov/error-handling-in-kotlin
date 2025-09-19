@@ -1,5 +1,6 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.orThrow
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -29,18 +30,18 @@ abstract class GameStoreTests(private val store: GameStore) {
     @Test fun `users take turns in the game`() {
         val id = store.newGame()
 
-        expectThat(store.makeMove(id, 0, 0, UserId("user-1")))
+        expectThat(store.makeMove_new(id, 0, 0, UserId("user-1")).orThrow())
             .isEqualTo(Game(listOf(
                 Move(0, 0, X)
             )))
 
-        expectThat(store.makeMove(id, 1, 1, UserId("user-2")))
+        expectThat(store.makeMove_new(id, 1, 1, UserId("user-2")).orThrow())
             .isEqualTo(Game(listOf(
                 Move(0, 0, X),
                 Move(1, 1, O)
             )))
 
-        expectThat(store.makeMove(id, 2, 2, UserId("user-1")))
+        expectThat(store.makeMove_new(id, 2, 2, UserId("user-1")).orThrow())
             .isEqualTo(Game(listOf(
                 Move(0, 0, X),
                 Move(1, 1, O),
@@ -52,10 +53,10 @@ abstract class GameStoreTests(private val store: GameStore) {
         val id1 = store.newGame()
         val id2 = store.newGame()
 
-        expectThat(store.makeMove(id1, 0, 0, UserId("some-user")))
+        expectThat(store.makeMove_new(id1, 0, 0, UserId("some-user")).orThrow())
             .isEqualTo(Game(listOf(Move(0, 0, X))))
 
-        expectThat(store.makeMove(id2, 1, 1, UserId("some-user")))
+        expectThat(store.makeMove_new(id2, 1, 1, UserId("some-user")).orThrow())
             .isEqualTo(Game(listOf(Move(1, 1, X))))
     }
 
@@ -67,7 +68,7 @@ abstract class GameStoreTests(private val store: GameStore) {
 
     @Test fun `can't make move in non-existent game`() {
         assertFailsWith<GameNotFound> {
-            store.makeMove(GameId("non-existent-id"), 0, 0, UserId("some-user"))
+            store.makeMove_new(GameId("non-existent-id"), 0, 0, UserId("some-user")).orThrow()
         }
     }
 }

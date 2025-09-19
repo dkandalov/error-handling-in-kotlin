@@ -6,9 +6,6 @@ import dev.forkhandles.result4k.orThrow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-fun GameStore.makeMove(id: GameId, x: Int, y: Int, userId: UserId): Game =
-    makeMove_new(id, x, y, userId).orThrow()
-
 class InMemoryGameStore(
     private val gamesById: MutableMap<GameId, Game> = ConcurrentHashMap(),
     private val generateId: () -> String = { UUID.randomUUID().toString() },

@@ -1,5 +1,6 @@
 package tictactoe4k
 
+import dev.forkhandles.result4k.orThrow
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -69,7 +70,7 @@ class WebApp(val gameStore: GameStore) {
         val userId = request.userId()!!
 
         try {
-            gameStore.makeMove(gameId, x, y, userId)
+            gameStore.makeMove_new(gameId, x, y, userId).orThrow()
         } catch (e: WrongPlayerMove) {
             return Response(SEE_OTHER).header("Location", "/game/$gameId")
         }
